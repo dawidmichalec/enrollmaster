@@ -266,9 +266,16 @@ def student_info_switch():
     student_info_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
         weight=1, minsize=30)
 
+    ## Config variable responsible for setting state of the elements
+
+    disabled_state = 'disabled'
+
+    ## name of the frame/page
 
     student_label = ttk.Label(student_info_frame, text='INFORMACJE O UCZNIU', font=('Open Sans', 14, 'bold'), bootstyle='default')
     student_label.grid(row=0, column=3, sticky='w')
+
+    ## student_id used for search purposes
 
     id_label = ttk.Label(student_info_frame, text='ID Ucznia', font=('Open Sans', 12), bootstyle='default')
     id_label.grid(row=2, column=2, sticky='w')
@@ -307,6 +314,7 @@ def student_info_switch():
     student_id_label.grid(row=8, column=0, sticky='w')
 
     student_id = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    student_id.configure(state=f'{disabled_state}')
     student_id.grid(row=9, column=0, sticky='w')
 
     ## output_first_name
@@ -315,6 +323,7 @@ def student_info_switch():
     output_first_name_label.grid(row=8, column=2, sticky='w')
 
     output_first_name = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    output_first_name.configure(state=f'{disabled_state}')
     output_first_name.grid(row=9, column=2, sticky='w')
 
     ## output_last_name
@@ -323,6 +332,7 @@ def student_info_switch():
     output_last_name_label.grid(row=8, column=3, sticky='w')
 
     output_last_name = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    output_last_name.configure(state=f'{disabled_state}')
     output_last_name.grid(row=9, column=3, sticky='w')
 
     ## output_street
@@ -331,6 +341,7 @@ def student_info_switch():
     output_street_label.grid(row=8, column=4, sticky='w')
 
     output_street = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=30)
+    output_street.configure(state=f'{disabled_state}')
     output_street.grid(row=9, column=4, sticky='w')
 
     ## output_building_no
@@ -339,6 +350,7 @@ def student_info_switch():
     output_building_no_label.grid(row=11, column=0, sticky='w')
 
     output_building_no = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    output_building_no.configure(state=f'{disabled_state}')
     output_building_no.grid(row=12, column=0, sticky='w')
 
     ## local_no_output
@@ -347,6 +359,7 @@ def student_info_switch():
     local_no_output_label.grid(row=11, column=2, sticky='w')
 
     local_no_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    local_no_output.configure(state=f'{disabled_state}')
     local_no_output.grid(row=12, column=2, sticky='w')
 
     ## city_output
@@ -355,6 +368,7 @@ def student_info_switch():
     city_output_label.grid(row=11, column=3, sticky='w')
 
     city_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=20)
+    city_output.configure(state=f'{disabled_state}')
     city_output.grid(row=12, column=3, sticky='w')
 
     ## postal_code_output
@@ -363,6 +377,7 @@ def student_info_switch():
     postal_code_output_label.grid(row=11, column=4, sticky='w')
 
     postal_code_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
+    postal_code_output.configure(state=f'{disabled_state}')
     postal_code_output.grid(row=12, column=4, sticky='w')
 
     ## country_output
@@ -371,6 +386,7 @@ def student_info_switch():
     country_output_label.grid(row=11, column=5, sticky='w')
 
     country_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    country_output.configure(state=f'{disabled_state}')
     country_output.grid(row=12, column=5, sticky='w')
 
     ## email_output
@@ -379,6 +395,7 @@ def student_info_switch():
     email_output_label.grid(row=14, column=0, sticky='w')
 
     email_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    email_output.configure(state=f'{disabled_state}')
     email_output.grid(row=15, column=0, sticky='w')
 
     ## phone_number_output
@@ -387,6 +404,7 @@ def student_info_switch():
     phone_number_output_label.grid(row=14, column=2, sticky='w')
 
     phone_number_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    phone_number_output.configure(state=f'{disabled_state}')
     phone_number_output.grid(row=15, column=2, sticky='w')
 
     ## personal_id_output
@@ -395,6 +413,7 @@ def student_info_switch():
     personal_id_output_label.grid(row=14, column=3, sticky='w')
 
     personal_id_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    personal_id_output.configure(state=f'{disabled_state}')
     personal_id_output.grid(row=15, column=3, sticky='w')
 
     ## document_no_output
@@ -403,6 +422,7 @@ def student_info_switch():
     document_no_output_label.grid(row=14, column=4, sticky='w')
 
     document_no_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    document_no_output.configure(state=f'{disabled_state}')
     document_no_output.grid(row=15, column=4, sticky='w')
 
     ## document_type_output
@@ -411,6 +431,7 @@ def student_info_switch():
     document_type_output_label.grid(row=14, column=5, sticky='w')
 
     document_type_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    document_type_output.configure(state=f'{disabled_state}')
     document_type_output.grid(row=15, column=5, sticky='w')
 
     ## course_name_output
@@ -419,6 +440,7 @@ def student_info_switch():
     course_name_output_label.grid(row=17, column=0, sticky='w')
 
     course_name_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    course_name_output.configure(state=f'{disabled_state}')
     course_name_output.grid(row=18, column=0, sticky='w')
 
     ## course_language_output
@@ -427,6 +449,7 @@ def student_info_switch():
     course_language_output_label.grid(row=17, column=2, sticky='w')
 
     course_language_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    course_language_output.configure(state=f'{disabled_state}')
     course_language_output.grid(row=18, column=2, sticky='w')
 
     ## status_output
@@ -435,6 +458,7 @@ def student_info_switch():
     status_output_label.grid(row=17, column=3, sticky='w')
 
     status_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    status_output.configure(state=f'{disabled_state}')
     status_output.grid(row=18, column=3, sticky='w')
 
     ## level_output
@@ -443,6 +467,7 @@ def student_info_switch():
     level_output_label.grid(row=17, column=4, sticky='w')
 
     level_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    level_output.configure(state=f'{disabled_state}')
     level_output.grid(row=18, column=4, sticky='w')
 
     ## mode_output
@@ -451,6 +476,7 @@ def student_info_switch():
     mode_output_label.grid(row=17, column=5, sticky='w')
 
     mode_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    mode_output.configure(state=f'{disabled_state}')
     mode_output.grid(row=18, column=5, sticky='w')
 
 
@@ -460,7 +486,7 @@ def student_info_switch():
     start_date_output_label.grid(row=20, column=2, sticky='w')
 
     start_date_output = ttk.DateEntry(student_info_frame, bootstyle='primary')
-    start_date_output.configure(state="readonly")
+    start_date_output.configure(state=f'{disabled_state}')
     start_date_output.grid(row=21, column=2, sticky='w')
 
     ## end_date_output
@@ -470,12 +496,9 @@ def student_info_switch():
     end_date_output_label.grid(row=20, column=4, sticky='w')
 
     end_date_output = ttk.DateEntry(student_info_frame, bootstyle='primary')
-    end_date_output.configure(state='readonly')
+    end_date_output.configure(state=f'{disabled_state}')
     end_date_output.grid(row=21, column=4, sticky='w')
 
-
-
-    disabled_button = 'disabled'
     ## edit button
     """
     When clicked, the entries change status from readonly to editable. 
@@ -484,13 +507,13 @@ def student_info_switch():
     edit_button_style = ttk.Style()
     edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
 
-    edit_button = ttk.Button(student_info_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton', state=f'{disabled_button}')
+    edit_button = ttk.Button(student_info_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton', state=f'{disabled_state}')
     edit_button.grid(row=24, column=2, sticky='w')
 
 
     ## save_button
 
-    save_button = ttk.Button(student_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_button}')
+    save_button = ttk.Button(student_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state}')
     save_button.grid(row=24, column=3, sticky='w')
 
 
@@ -499,7 +522,7 @@ def student_info_switch():
     block_button_style = ttk.Style()
     block_button_style.configure('warning.TButton', font=('Open Sans', 15))
 
-    block_button = ttk.Button(student_info_frame, bootstyle='warning', text='ZABLOKUJ', width=15, state=f'{disabled_button}')
+    block_button = ttk.Button(student_info_frame, bootstyle='warning', text='ZABLOKUJ', width=15, state=f'{disabled_state}')
     block_button.grid(row=24, column=4, sticky='w')
 
 
@@ -508,7 +531,7 @@ def student_info_switch():
     cancel_button_style = ttk.Style()
     cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
 
-    cancel_button = ttk.Button(student_info_frame, bootstyle='danger', text='ODRZUĆ', width=15, state=f'{disabled_button}')
+    cancel_button = ttk.Button(student_info_frame, bootstyle='danger', text='ODRZUĆ', width=15, state=f'{disabled_state}')
     cancel_button.grid(row=26, column=3, sticky='w')
 
     student_info_frame.pack()
