@@ -1344,6 +1344,7 @@ def teacher_info_switch():
 
     ## Config variable responsible for setting state of the elements
 
+    free_state = ''
     disabled_state = 'disabled'
     readonly_state = 'readonly'
     disabled_state_button = 'disabled'
@@ -1361,8 +1362,12 @@ def teacher_info_switch():
     phone_number_var = ''
     personal_id_var = ''
     document_no_var = ''
+    document_type_var = ''
+    type_of_contract_var = ''
+    type_of_employment_var = ''
     salary_var = ''
     native_language_var = ''
+    language_to_teach_var = ''
     employment_status_var = ''
 
     ## name of the frame/page
@@ -1470,8 +1475,9 @@ def teacher_info_switch():
     city_output_label = ttk.Label(teacher_info_frame, text='Miasto', font=('Open Sans', 12), bootstyle='default')
     city_output_label.grid(row=11, column=3, sticky='w')
 
-    city_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=20)
-    city_output.configure(state=f'{disabled_state}')
+    city_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=20)
+    city_output.insert('end', city_var)
+    city_output.configure(state=f'{readonly_state}')
     city_output.grid(row=12, column=3, sticky='w')
 
     ## postal_code_output
@@ -1480,8 +1486,9 @@ def teacher_info_switch():
                                          bootstyle='default')
     postal_code_output_label.grid(row=11, column=4, sticky='w')
 
-    postal_code_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    postal_code_output.configure(state=f'{disabled_state}')
+    postal_code_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    postal_code_output.insert('end', postal_code_var)
+    postal_code_output.configure(state=f'{readonly_state}')
     postal_code_output.grid(row=12, column=4, sticky='w')
 
     ## country_output
@@ -1489,8 +1496,9 @@ def teacher_info_switch():
     country_output_label = ttk.Label(teacher_info_frame, text='Państwo', font=('Open Sans', 12), bootstyle='default')
     country_output_label.grid(row=11, column=5, sticky='w')
 
-    country_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    country_output.configure(state=f'{disabled_state}')
+    country_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    country_output.insert('end', country_var)
+    country_output.configure(state=f'{readonly_state}')
     country_output.grid(row=12, column=5, sticky='w')
 
     ## email_output
@@ -1498,8 +1506,9 @@ def teacher_info_switch():
     email_output_label = ttk.Label(teacher_info_frame, text='Adres e-mail', font=('Open Sans', 12), bootstyle='default')
     email_output_label.grid(row=14, column=0, sticky='w')
 
-    email_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    email_output.configure(state=f'{disabled_state}')
+    email_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    email_output.insert('end', email_var)
+    email_output.configure(state=f'{readonly_state}')
     email_output.grid(row=15, column=0, sticky='w')
 
     ## phone_number_output
@@ -1508,8 +1517,9 @@ def teacher_info_switch():
                                           bootstyle='default')
     phone_number_output_label.grid(row=14, column=2, sticky='w')
 
-    phone_number_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    phone_number_output.configure(state=f'{disabled_state}')
+    phone_number_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    phone_number_output.insert('end', phone_number_var)
+    phone_number_output.configure(state=f'{readonly_state}')
     phone_number_output.grid(row=15, column=2, sticky='w')
 
     ## personal_id_output
@@ -1517,8 +1527,9 @@ def teacher_info_switch():
     personal_id_output_label = ttk.Label(teacher_info_frame, text='PESEL', font=('Open Sans', 12), bootstyle='default')
     personal_id_output_label.grid(row=14, column=3, sticky='w')
 
-    personal_id_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    personal_id_output.configure(state=f'{disabled_state}')
+    personal_id_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    personal_id_output.insert('end', personal_id_var)
+    personal_id_output.configure(state=f'{readonly_state}')
     personal_id_output.grid(row=15, column=3, sticky='w')
 
     ## document_no_output
@@ -1527,8 +1538,9 @@ def teacher_info_switch():
                                          bootstyle='default')
     document_no_output_label.grid(row=14, column=4, sticky='w')
 
-    document_no_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    document_no_output.configure(state=f'{disabled_state}')
+    document_no_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    document_no_output.insert('end', document_no_var)
+    document_no_output.configure(state=f'{readonly_state}')
     document_no_output.grid(row=15, column=4, sticky='w')
 
     ## document_type_output
@@ -1537,9 +1549,18 @@ def teacher_info_switch():
                                            bootstyle='default')
     document_type_output_label.grid(row=14, column=5, sticky='w')
 
-    document_type_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
+    document_type_output = ttk.Menubutton(teacher_info_frame, bootstyle='dark', text=f'{document_type_var}')
     document_type_output.configure(state=f'{disabled_state}')
     document_type_output.grid(row=15, column=5, sticky='w')
+
+    document_type_content = ttk.Menu(document_type_output)
+
+    item_var = StringVar()
+    for x in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
+        document_type_content.add_radiobutton(label=x, variable=item_var,
+                                              command=lambda x=x: amend_menu_content(document_type_output, x))
+
+    document_type_output['menu'] = document_type_content
 
     ## type_of_contract_output
 
@@ -1547,9 +1568,20 @@ def teacher_info_switch():
                                          bootstyle='default')
     type_of_contract_output_label.grid(row=17, column=0, sticky='w')
 
-    type_of_contract_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
+    type_of_contract_output = ttk.Menubutton(teacher_info_frame, bootstyle='dark', text=f'{type_of_contract_var}')
     type_of_contract_output.configure(state=f'{disabled_state}')
     type_of_contract_output.grid(row=18, column=0, sticky='w')
+
+    type_of_contract_output_content = ttk.Menu(type_of_contract_output)
+
+    type_var = StringVar()
+
+    for x in ['Umowa o pracę', 'Umowa zlecenie']:
+        type_of_contract_output_content.add_radiobutton(label=x, variable=type_var,
+                                                 command=lambda x=x: amend_menu_content(type_of_contract_output, x))
+
+    type_of_contract_output['menu'] = type_of_contract_output_content
+
 
     ## type_of_employment_output
 
@@ -1557,17 +1589,28 @@ def teacher_info_switch():
                                              bootstyle='default')
     type_of_employment_output_label.grid(row=17, column=2, sticky='w')
 
-    type_of_employment_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
+    type_of_employment_output = ttk.Menubutton(teacher_info_frame, bootstyle='dark', text=f'{type_of_employment_var}')
     type_of_employment_output.configure(state=f'{disabled_state}')
     type_of_employment_output.grid(row=18, column=2, sticky='w')
+
+    type_of_employment_output_content = ttk.Menu(type_of_employment_output)
+
+    employment_var = StringVar()
+
+
+    for x in ['Pełny etat', 'Pół etatu']:
+        type_of_employment_output_content.add_radiobutton(label=x, variable=employment_var, command=lambda x=x:amend_menu_content(type_of_employment_output, x))
+
+    type_of_employment_output['menu'] = type_of_employment_output_content
 
     ## salary_output
 
     salary_output_label = ttk.Label(teacher_info_frame, text='Wynagrodzenie', font=('Open Sans', 12), bootstyle='default')
     salary_output_label.grid(row=17, column=3, sticky='w')
 
-    salary_output= ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    salary_output.configure(state=f'{disabled_state}')
+    salary_output= ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    salary_output.insert('end', salary_var)
+    salary_output.configure(state=f'{readonly_state}')
     salary_output.grid(row=18, column=3, sticky='w')
 
     ## native_language_output
@@ -1575,8 +1618,9 @@ def teacher_info_switch():
     native_language_output_label = ttk.Label(teacher_info_frame, text='Język ojczysty', font=('Open Sans', 12), bootstyle='default')
     native_language_output_label.grid(row=17, column=4, sticky='w')
 
-    native_language_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    native_language_output.configure(state=f'{disabled_state}')
+    native_language_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    native_language_output.insert('end', native_language_var)
+    native_language_output.configure(state='readonly')
     native_language_output.grid(row=18, column=4, sticky='w')
 
     ## language_to_teach_output
@@ -1584,8 +1628,9 @@ def teacher_info_switch():
     language_to_teach_output_label = ttk.Label(teacher_info_frame, text='Język nauczania', font=('Open Sans', 12), bootstyle='default')
     language_to_teach_output_label.grid(row=17, column=5, sticky='w')
 
-    language_to_teach_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    language_to_teach_output.configure(state=f'{disabled_state}')
+    language_to_teach_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    language_to_teach_output.insert('end', language_to_teach_var)
+    language_to_teach_output.configure(state='readonly')
     language_to_teach_output.grid(row=18, column=5, sticky='w')
 
     ## start_date_output
@@ -1595,7 +1640,7 @@ def teacher_info_switch():
     start_date_output_label.grid(row=20, column=0, sticky='w')
 
     start_date_output = ttk.DateEntry(teacher_info_frame, bootstyle='primary')
-    start_date_output.configure(state=f'{disabled_state}')
+    start_date_output.configure(state=f'{readonly_state}')
     start_date_output.grid(row=21, column=0, sticky='w')
 
     ## status_of_employment
@@ -1603,8 +1648,9 @@ def teacher_info_switch():
     status_of_employment_label = ttk.Label(teacher_info_frame, text='Status zatrudnienia', font=('Open Sans', 12), bootstyle='default')
     status_of_employment_label.grid(row=20, column=2, sticky='w')
 
-    status_of_employment = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=25)
-    status_of_employment.configure(state=f'{disabled_state}')
+    status_of_employment = ttk.Entry(teacher_info_frame, bootstyle='default', width=25)
+    status_of_employment.insert('end', employment_status_var)
+    status_of_employment.configure(state='readonly')
     status_of_employment.grid(row=21, column=2, sticky='w')
 
     ## edit button
@@ -1616,12 +1662,12 @@ def teacher_info_switch():
     edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
 
     edit_button = ttk.Button(teacher_info_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton',
-                             state=f'{disabled_state}')
+                             state=f'{disabled_state_button}')
     edit_button.grid(row=24, column=2, sticky='w')
 
     ## save_button
 
-    save_button = ttk.Button(teacher_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state}')
+    save_button = ttk.Button(teacher_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state_button}')
     save_button.grid(row=24, column=3, sticky='w')
 
     ## block_button
@@ -1630,7 +1676,7 @@ def teacher_info_switch():
     block_button_style.configure('warning.TButton', font=('Open Sans', 15))
 
     block_button = ttk.Button(teacher_info_frame, bootstyle='warning', text='ZABLOKUJ', width=15,
-                              state=f'{disabled_state}')
+                              state=f'{disabled_state_button}')
     block_button.grid(row=24, column=4, sticky='w')
 
     ## cancel_button - sets entries back to the readonly state and buttons do disabled state, including itself
@@ -1639,7 +1685,7 @@ def teacher_info_switch():
     cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
 
     cancel_button = ttk.Button(teacher_info_frame, bootstyle='danger', text='ODRZUĆ', width=15,
-                               state=f'{disabled_state}')
+                               state=f'{disabled_state_button}')
     cancel_button.grid(row=26, column=3, sticky='w')
 
     teacher_info_frame.pack()
