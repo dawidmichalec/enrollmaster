@@ -266,9 +266,30 @@ def student_info_switch():
     student_info_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
         weight=1, minsize=30)
 
-    ## Config variable responsible for setting state of the elements
-
+    ## Config variable responsible for setting state of the elements and inserting data from the database.
+    free_state = ""
+    readonly_state = 'readonly'
     disabled_state = 'disabled'
+    disabled_state_button = 'disabled'
+    student_id_var =''
+    first_name_var = ''
+    last_name_var = ''
+    street_var = ''
+    building_no_var = ''
+    local_no_var = ''
+    city_var = ''
+    postal_code_var = ''
+    country_var = ''
+    email_var = ''
+    phone_number_var = ''
+    personal_id_var = ''
+    document_no_var = ''
+    document_type_var = ''
+    course_name_var = ''
+    language_db = ""
+    status_var = ''
+    level_db = ""
+    mode_db = ""
 
     ## name of the frame/page
 
@@ -313,8 +334,9 @@ def student_info_switch():
     student_id_label = ttk.Label(student_info_frame, text='ID Ucznia', font=('Open Sans', 12), bootstyle='default')
     student_id_label.grid(row=8, column=0, sticky='w')
 
-    student_id = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    student_id.configure(state=f'{disabled_state}')
+    student_id = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    student_id.insert('end', student_id_var)
+    student_id.configure(state='readonly')
     student_id.grid(row=9, column=0, sticky='w')
 
     ## output_first_name
@@ -322,8 +344,9 @@ def student_info_switch():
     output_first_name_label = ttk.Label(student_info_frame, text='Imię', font=('Open Sans', 12), bootstyle='default')
     output_first_name_label.grid(row=8, column=2, sticky='w')
 
-    output_first_name = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    output_first_name.configure(state=f'{disabled_state}')
+    output_first_name = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    output_first_name.insert('end', first_name_var)
+    output_first_name.configure(state=f'{readonly_state}')
     output_first_name.grid(row=9, column=2, sticky='w')
 
     ## output_last_name
@@ -331,8 +354,9 @@ def student_info_switch():
     output_last_name_label = ttk.Label(student_info_frame, text='Nazwisko', font=('Open Sans', 12), bootstyle='default')
     output_last_name_label.grid(row=8, column=3, sticky='w')
 
-    output_last_name = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    output_last_name.configure(state=f'{disabled_state}')
+    output_last_name = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    output_last_name.insert('end', last_name_var)
+    output_last_name.configure(state=f'{readonly_state}')
     output_last_name.grid(row=9, column=3, sticky='w')
 
     ## output_street
@@ -340,8 +364,9 @@ def student_info_switch():
     output_street_label = ttk.Label(student_info_frame, text='Ulica', font=('Open Sans', 12), bootstyle='default')
     output_street_label.grid(row=8, column=4, sticky='w')
 
-    output_street = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=30)
-    output_street.configure(state=f'{disabled_state}')
+    output_street = ttk.Entry(student_info_frame, bootstyle='default', width=30)
+    output_street.insert('end', street_var)
+    output_street.configure(state=f'{readonly_state}')
     output_street.grid(row=9, column=4, sticky='w')
 
     ## output_building_no
@@ -349,8 +374,9 @@ def student_info_switch():
     output_building_no_label = ttk.Label(student_info_frame, text='Nr domu', font=('Open Sans', 12), bootstyle='default')
     output_building_no_label.grid(row=11, column=0, sticky='w')
 
-    output_building_no = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    output_building_no.configure(state=f'{disabled_state}')
+    output_building_no = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    output_building_no.insert('end', building_no_var)
+    output_building_no.configure(state=f'{readonly_state}')
     output_building_no.grid(row=12, column=0, sticky='w')
 
     ## local_no_output
@@ -358,8 +384,9 @@ def student_info_switch():
     local_no_output_label = ttk.Label(student_info_frame, text='Nr lokalu', font=('Open Sans', 12), bootstyle='default')
     local_no_output_label.grid(row=11, column=2, sticky='w')
 
-    local_no_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    local_no_output.configure(state=f'{disabled_state}')
+    local_no_output = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    local_no_output.insert('end', local_no_var)
+    local_no_output.configure(state=f'{readonly_state}')
     local_no_output.grid(row=12, column=2, sticky='w')
 
     ## city_output
@@ -367,8 +394,9 @@ def student_info_switch():
     city_output_label = ttk.Label(student_info_frame, text='Miasto', font=('Open Sans', 12), bootstyle='default')
     city_output_label.grid(row=11, column=3, sticky='w')
 
-    city_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=20)
-    city_output.configure(state=f'{disabled_state}')
+    city_output = ttk.Entry(student_info_frame, bootstyle='default', width=20)
+    city_output.insert('end', city_var)
+    city_output.configure(state=f'{readonly_state}')
     city_output.grid(row=12, column=3, sticky='w')
 
     ## postal_code_output
@@ -376,8 +404,9 @@ def student_info_switch():
     postal_code_output_label = ttk.Label(student_info_frame, text='Kod pocztowy', font=('Open Sans', 12), bootstyle='default')
     postal_code_output_label.grid(row=11, column=4, sticky='w')
 
-    postal_code_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=15)
-    postal_code_output.configure(state=f'{disabled_state}')
+    postal_code_output = ttk.Entry(student_info_frame, bootstyle='default', width=15)
+    postal_code_output.insert('end', postal_code_var)
+    postal_code_output.configure(state=f'{readonly_state}')
     postal_code_output.grid(row=12, column=4, sticky='w')
 
     ## country_output
@@ -385,8 +414,9 @@ def student_info_switch():
     country_output_label = ttk.Label(student_info_frame, text='Państwo', font=('Open Sans', 12), bootstyle='default')
     country_output_label.grid(row=11, column=5, sticky='w')
 
-    country_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    country_output.configure(state=f'{disabled_state}')
+    country_output = ttk.Entry(student_info_frame, bootstyle='default', width=25)
+    country_output.insert('end', country_var)
+    country_output.configure(state=f'{readonly_state}')
     country_output.grid(row=12, column=5, sticky='w')
 
     ## email_output
@@ -394,8 +424,9 @@ def student_info_switch():
     email_output_label = ttk.Label(student_info_frame, text='Adres e-mail', font=('Open Sans', 12), bootstyle='default')
     email_output_label.grid(row=14, column=0, sticky='w')
 
-    email_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    email_output.configure(state=f'{disabled_state}')
+    email_output = ttk.Entry(student_info_frame, bootstyle='default', width=25)
+    email_output.insert('end', email_var)
+    email_output.configure(state=f'{readonly_state}')
     email_output.grid(row=15, column=0, sticky='w')
 
     ## phone_number_output
@@ -403,17 +434,20 @@ def student_info_switch():
     phone_number_output_label = ttk.Label(student_info_frame, text='Nr telefonu', font=('Open Sans', 12), bootstyle='default')
     phone_number_output_label.grid(row=14, column=2, sticky='w')
 
-    phone_number_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    phone_number_output.configure(state=f'{disabled_state}')
+    phone_number_output = ttk.Entry(student_info_frame, bootstyle='default', textvariable=phone_number_var, width=25)
+    phone_number_output.insert('end', phone_number_var)
+    phone_number_output.configure(state=f'{readonly_state}',)
     phone_number_output.grid(row=15, column=2, sticky='w')
+
 
     ## personal_id_output
 
     personal_id_output_label = ttk.Label(student_info_frame, text='PESEL', font=('Open Sans', 12), bootstyle='default')
     personal_id_output_label.grid(row=14, column=3, sticky='w')
 
-    personal_id_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    personal_id_output.configure(state=f'{disabled_state}')
+    personal_id_output = ttk.Entry(student_info_frame, bootstyle='default', width=25)
+    personal_id_output.insert('end', personal_id_var)
+    personal_id_output.configure(state=f'{readonly_state}')
     personal_id_output.grid(row=15, column=3, sticky='w')
 
     ## document_no_output
@@ -421,8 +455,9 @@ def student_info_switch():
     document_no_output_label = ttk.Label(student_info_frame, text='Nr dokumentu', font=('Open Sans', 12), bootstyle='default')
     document_no_output_label.grid(row=14, column=4, sticky='w')
 
-    document_no_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    document_no_output.configure(state=f'{disabled_state}')
+    document_no_output = ttk.Entry(student_info_frame, bootstyle='default', width=25)
+    document_no_output.insert('end', document_no_var)
+    document_no_output.configure(state=f'{readonly_state}')
     document_no_output.grid(row=15, column=4, sticky='w')
 
     ## document_type_output
@@ -430,27 +465,52 @@ def student_info_switch():
     document_type_output_label = ttk.Label(student_info_frame, text='Rodzaj dokumentu', font=('Open Sans', 12), bootstyle='default')
     document_type_output_label.grid(row=14, column=5, sticky='w')
 
-    document_type_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    document_type_output = ttk.Menubutton(student_info_frame, bootstyle='dark',  text=f'{document_type_var}')
     document_type_output.configure(state=f'{disabled_state}')
     document_type_output.grid(row=15, column=5, sticky='w')
+
+    document_type_content = ttk.Menu(document_type_output)
+
+    item_var = StringVar()
+    for x in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
+        document_type_content.add_radiobutton(label=x, variable=item_var,
+                                              command=lambda x=x: amend_menu_content(document_type_output, x))
+
+    document_type_output['menu'] = document_type_content
 
     ## course_name_output
 
     course_name_output_label = ttk.Label(student_info_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
     course_name_output_label.grid(row=17, column=0, sticky='w')
 
-    course_name_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    course_name_output = ttk.Menubutton(student_info_frame, bootstyle='dark', text=f'{course_name_var}')
     course_name_output.configure(state=f'{disabled_state}')
     course_name_output.grid(row=18, column=0, sticky='w')
+
+    course_name_output_content = ttk.Menu(course_name_output)
+
+    course_var = StringVar()
+
+
 
     ## course_language_output
 
     course_language_output_label = ttk.Label(student_info_frame, text='Język kursu', font=('Open Sans', 12), bootstyle='default')
     course_language_output_label.grid(row=17, column=2, sticky='w')
 
-    course_language_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    course_language_output = ttk.Menubutton(student_info_frame, bootstyle='dark', text=f'{language_db}')
     course_language_output.configure(state=f'{disabled_state}')
     course_language_output.grid(row=18, column=2, sticky='w')
+
+
+    course_language_output_content = ttk.Menu(course_language_output)
+
+    language_var = StringVar()
+    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        course_language_output_content.add_radiobutton(label=x, variable=language_var,
+                                                  command=lambda x=x: amend_menu_content(course_language_output, x))
+
+    course_language_output['menu'] = course_language_output_content
 
     ## status_output
 
@@ -458,7 +518,8 @@ def student_info_switch():
     status_output_label.grid(row=17, column=3, sticky='w')
 
     status_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
-    status_output.configure(state=f'{disabled_state}')
+    status_output.insert('end', status_var)
+    status_output.configure(state='readonly')
     status_output.grid(row=18, column=3, sticky='w')
 
     ## level_output
@@ -466,19 +527,38 @@ def student_info_switch():
     level_output_label = ttk.Label(student_info_frame, text='Poziom', font=('Open Sans', 12), bootstyle='default')
     level_output_label.grid(row=17, column=4, sticky='w')
 
-    level_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    level_output = ttk.Menubutton(student_info_frame, bootstyle='dark', text=f'{level_db}')
     level_output.configure(state=f'{disabled_state}')
     level_output.grid(row=18, column=4, sticky='w')
 
-    ## mode_output
+    level_output_content = ttk.Menu(level_output)
+
+    level_var = StringVar()
+
+    for x in ['Początkujący', 'Zaawansowany']:
+        level_output_content.add_radiobutton(label=x, variable=level_var,
+                                               command=lambda x=x: amend_menu_content(level_output, x))
+
+    level_output['menu'] = level_output_content
+
+    ## mode_output POPRAWIĆ NA DROPDOWN
 
     mode_output_label = ttk.Label(student_info_frame, text='Tryb', font=('Open Sans', 12), bootstyle='default')
     mode_output_label.grid(row=17, column=5, sticky='w')
 
-    mode_output = ttk.Entry(student_info_frame, bootstyle='default', state='readonly', width=25)
+    mode_output = ttk.Menubutton(student_info_frame, bootstyle='dark', text=f'{mode_db}')
     mode_output.configure(state=f'{disabled_state}')
     mode_output.grid(row=18, column=5, sticky='w')
 
+    mode_output_content = ttk.Menu(mode_output)
+
+    mode_var = StringVar()
+
+    for x in ['Normalny', 'Przyspieszony']:
+        mode_output_content.add_radiobutton(label=x, variable=mode_var,
+                                              command=lambda x=x: amend_menu_content(mode_output, x))
+
+    mode_output['menu'] = mode_output_content
 
     ## start_date_output
 
@@ -486,7 +566,7 @@ def student_info_switch():
     start_date_output_label.grid(row=20, column=2, sticky='w')
 
     start_date_output = ttk.DateEntry(student_info_frame, bootstyle='primary')
-    start_date_output.configure(state=f'{disabled_state}')
+    start_date_output.configure(state=f'{readonly_state}')
     start_date_output.grid(row=21, column=2, sticky='w')
 
     ## end_date_output
@@ -496,7 +576,7 @@ def student_info_switch():
     end_date_output_label.grid(row=20, column=4, sticky='w')
 
     end_date_output = ttk.DateEntry(student_info_frame, bootstyle='primary')
-    end_date_output.configure(state=f'{disabled_state}')
+    end_date_output.configure(state=f'{readonly_state}')
     end_date_output.grid(row=21, column=4, sticky='w')
 
     ## edit button
@@ -507,13 +587,13 @@ def student_info_switch():
     edit_button_style = ttk.Style()
     edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
 
-    edit_button = ttk.Button(student_info_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton', state=f'{disabled_state}')
+    edit_button = ttk.Button(student_info_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton', state=f'{disabled_state_button}')
     edit_button.grid(row=24, column=2, sticky='w')
 
 
     ## save_button
 
-    save_button = ttk.Button(student_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state}')
+    save_button = ttk.Button(student_info_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state_button}')
     save_button.grid(row=24, column=3, sticky='w')
 
 
@@ -522,7 +602,7 @@ def student_info_switch():
     block_button_style = ttk.Style()
     block_button_style.configure('warning.TButton', font=('Open Sans', 15))
 
-    block_button = ttk.Button(student_info_frame, bootstyle='warning', text='ZABLOKUJ', width=15, state=f'{disabled_state}')
+    block_button = ttk.Button(student_info_frame, bootstyle='warning', text='ZABLOKUJ', width=15, state=f'{disabled_state_button}')
     block_button.grid(row=24, column=4, sticky='w')
 
 
@@ -531,7 +611,7 @@ def student_info_switch():
     cancel_button_style = ttk.Style()
     cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
 
-    cancel_button = ttk.Button(student_info_frame, bootstyle='danger', text='ODRZUĆ', width=15, state=f'{disabled_state}')
+    cancel_button = ttk.Button(student_info_frame, bootstyle='danger', text='ODRZUĆ', width=15, state=f'{disabled_state_button}')
     cancel_button.grid(row=26, column=3, sticky='w')
 
     student_info_frame.pack()
@@ -675,11 +755,195 @@ def edit_course_switch():
         (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
         weight=1, minsize=30)
 
+    ## Variables
+
+    readonly_state = "readonly"
+    disabled_state= "disabled"
+    disabled_state_button = "disabled"
+
+    course_id_var = ''
+    course_name_var = ''
+    language_db = ''
+    level_db = ''
+    mode_db = ''
+    teacher_name = ''
+    prize_var = ''
 
     ## edit_course_label
 
     edit_course_label = ttk.Label(edit_course_frame, text='EDYTUJ KURS', font=('Open Sans', 14, 'bold'), bootstyle='default')
     edit_course_label.grid(row=0, column=2, sticky='w')
+
+    ## course_id search
+
+    course_id_search_label = ttk.Label(edit_course_frame, text='ID kursu', font=('Open Sans', 12), bootstyle='default')
+    course_id_search_label.grid(row=2, column=1, sticky='w')
+
+    course_id_search_entry = ttk.Entry(edit_course_frame, bootstyle='light', width=20)
+    course_id_search_entry.grid(row=3, column=1, sticky='w')
+
+    ## course_name_search
+
+    course_name_search_label = ttk.Label(edit_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
+    course_name_search_label.grid(row=2, column=2, sticky='w')
+
+    course_name_search_entry = ttk.Entry(edit_course_frame, bootstyle='light', width=30)
+    course_name_search_entry.grid(row=3, column=2, sticky='w')
+
+    submit_button_style = ttk.Style()
+    submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+
+    submit_button = ttk.Button(edit_course_frame, bootstyle='success', text='SZUKAJ', width=15,
+                               style='success.TButton')
+    submit_button.grid(row=5, column=2, sticky='w')
+
+
+    ## course_id
+
+    course_id_label = ttk.Label(edit_course_frame, text='ID Kursu', font=('Open Sans', 12), bootstyle='default')
+    course_id_label.grid(row=8, column=0, sticky='w')
+
+    course_id_entry = ttk.Entry(edit_course_frame, bootstyle='default', width=20)
+    course_id_entry.insert('end', course_id_var)
+    course_id_entry.configure(state='readonly')
+    course_id_entry.grid(row=9, column=0, sticky='w')
+
+
+    ## course_name
+
+    course_name_label = ttk.Label(edit_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
+    course_name_label.grid(row=8, column=1, sticky='w')
+
+    course_name_entry = ttk.Entry(edit_course_frame, bootstyle='default', width=30)
+    course_name_entry.insert('end', course_name_var)
+    course_name_entry.configure(state=f'{readonly_state}')
+    course_name_entry.grid(row=9, column=1, sticky='w')
+
+    ## course_language
+
+    course_language_label = ttk.Label(edit_course_frame, text="Język kursu", font=('Open Sans', 12),
+                                      bootstyle='default')
+    course_language_label.grid(row=8, column=2, sticky='w')
+
+    course_language_dropdown = ttk.Menubutton(edit_course_frame, bootstyle='dark', text=f"{language_db}")
+    course_language_dropdown.configure(state=f'{disabled_state}')
+    course_language_dropdown.grid(row=9, column=2, sticky='w')
+
+    course_language_dropdown_content = ttk.Menu(course_language_dropdown)
+
+    course_language_var = StringVar()
+    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        course_language_dropdown_content.add_radiobutton(label=x, variable=course_language_var,
+                                                         command=lambda x=x: amend_menu_content(
+                                                             course_language_dropdown, x))
+
+    course_language_dropdown['menu'] = course_language_dropdown_content
+
+    ## course_level
+
+    course_level_label = ttk.Label(edit_course_frame, text='Poziom', font=('Open Sans', 12), bootstyle='default')
+    course_level_label.grid(row=8, column=3, sticky='w')
+
+    course_level_dropdown = ttk.Menubutton(edit_course_frame, bootstyle='dark', text=f'{level_db}')
+    course_level_dropdown.configure(state=f'{disabled_state}')
+    course_level_dropdown.grid(row=9, column=3, sticky='w')
+
+    course_level_dropdown_content = ttk.Menu(course_level_dropdown)
+
+    course_level_var = StringVar()
+
+    for x in ['Początkujący', 'Zaawansowany']:
+        course_level_dropdown_content.add_radiobutton(label=x, variable=course_level_var,
+                                                      command=lambda x=x: amend_menu_content(course_level_dropdown, x))
+
+    course_level_dropdown['menu'] = course_level_dropdown_content
+
+    ## course_mode
+
+    mode_label = ttk.Label(edit_course_frame, text=f"Tryb", font=('Open Sans', 12), bootstyle='default')
+    mode_label.grid(row=8, column=4, sticky='w')
+
+    mode_dropdown = ttk.Menubutton(edit_course_frame, bootstyle='dark', text=f"{mode_db}")
+    mode_dropdown.configure(state=f'{disabled_state}')
+    mode_dropdown.grid(row=9, column=4, sticky='w')
+
+    mode_dropdown_content = ttk.Menu(mode_dropdown)
+
+    mode_var = StringVar()
+
+    choice = ""
+
+    for x in ['Normalny', 'Przyspieszony']:
+        mode_dropdown_content.add_radiobutton(label=x, variable=mode_var,
+                                              command=lambda x=x: amend_menu_content(mode_dropdown, x))
+
+    mode_dropdown['menu'] = mode_dropdown_content
+
+    ## start_date
+
+    start_date_label = ttk.Label(edit_course_frame, text='Data rozpoczęcia', font=('Open Sans', 12),
+                                 bootstyle='default')
+    start_date_label.grid(row=11, column=0, sticky='w')
+
+    start_date_entry = ttk.DateEntry(edit_course_frame, bootstyle='primary')
+    start_date_entry.configure(state=f'{readonly_state}')
+    start_date_entry.grid(row=12, column=0, sticky='w')
+
+    ## end date
+
+    end_date_label = ttk.Label(edit_course_frame, text='Data zakończenia', font=('Open Sans', 12),
+                               bootstyle='default')
+    end_date_label.grid(row=11, column=1, sticky='w')
+
+    end_date_entry = ttk.DateEntry(edit_course_frame, bootstyle='primary')
+    end_date_entry.configure(state=f'{readonly_state}')
+    end_date_entry.grid(row=12, column=1, sticky='w')
+
+    ## teacher_selection
+
+    teacher_selection_label = ttk.Label(edit_course_frame, text='Nauczyciel', font=('Open Sans', 12),
+                                        bootstyle='default')
+    teacher_selection_label.grid(row=11, column=2, sticky='w')
+
+    teacher_selection_dropdown = ttk.Menubutton(edit_course_frame, text=f'{teacher_name}', bootstyle='dark')
+    teacher_selection_dropdown.configure(state=f'{disabled_state}')
+    teacher_selection_dropdown.grid(row=12, column=2, sticky='w')
+
+    ## prize
+
+    prize_label = ttk.Label(edit_course_frame, text="Cena", font=('Open Sans', 12), bootstyle='default')
+    prize_label.grid(row=11, column=3, sticky='w')
+
+    prize_entry = ttk.Entry(edit_course_frame, bootstyle='default', width=15)
+    prize_entry.insert('end', prize_var)
+    prize_entry.configure(state=f'{readonly_state}')
+    prize_entry.grid(row=12, column=3, sticky='w')
+
+    ## edit button
+    """
+    When clicked, the entries change status from readonly to editable. 
+    """
+
+    edit_button_style = ttk.Style()
+    edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
+
+    edit_button = ttk.Button(edit_course_frame, bootstyle='primary', text='EDYTUJ', width=15, style='primary.TButton',
+                             state=f'{disabled_state_button}')
+    edit_button.grid(row=16, column=1, sticky='w')
+
+    ## save_button
+
+    save_button = ttk.Button(edit_course_frame, bootstyle='info', text='ZAPISZ', width=16, state=f'{disabled_state_button}')
+    save_button.grid(row=16, column=2, sticky='w')
+
+    ## cancel_button - sets entries back to the readonly state and buttons do disabled state, including itself
+
+    cancel_button_style = ttk.Style()
+    cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
+
+    cancel_button = ttk.Button(edit_course_frame, bootstyle='danger', text='ODRZUĆ', width=15,
+                               state=f'{disabled_state_button}')
+    cancel_button.grid(row=16, column=3, sticky='w')
 
     edit_course_frame.pack()
 
@@ -1081,6 +1345,25 @@ def teacher_info_switch():
     ## Config variable responsible for setting state of the elements
 
     disabled_state = 'disabled'
+    readonly_state = 'readonly'
+    disabled_state_button = 'disabled'
+
+    teacher_id_var = ''
+    first_name_var = ''
+    last_name_var = ''
+    street_var = ''
+    building_no_var = ''
+    local_no_var = ''
+    city_var = ''
+    postal_code_var = ''
+    country_var = ''
+    email_var = ''
+    phone_number_var = ''
+    personal_id_var = ''
+    document_no_var = ''
+    salary_var = ''
+    native_language_var = ''
+    employment_status_var = ''
 
     ## name of the frame/page
 
@@ -1126,8 +1409,9 @@ def teacher_info_switch():
     teacher_id_label = ttk.Label(teacher_info_frame, text='ID Nauczyciela', font=('Open Sans', 12), bootstyle='default')
     teacher_id_label.grid(row=8, column=0, sticky='w')
 
-    teacher_id = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    teacher_id.configure(state=f'{disabled_state}')
+    teacher_id = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    teacher_id.insert('end', teacher_id_var)
+    teacher_id.configure(state=f'{readonly_state}')
     teacher_id.grid(row=9, column=0, sticky='w')
 
     ## output_first_name
@@ -1135,8 +1419,9 @@ def teacher_info_switch():
     output_first_name_label = ttk.Label(teacher_info_frame, text='Imię', font=('Open Sans', 12), bootstyle='default')
     output_first_name_label.grid(row=8, column=2, sticky='w')
 
-    output_first_name = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    output_first_name.configure(state=f'{disabled_state}')
+    output_first_name = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    output_first_name.insert('end', first_name_var)
+    output_first_name.configure(state=f'{readonly_state}')
     output_first_name.grid(row=9, column=2, sticky='w')
 
     ## output_last_name
@@ -1144,8 +1429,9 @@ def teacher_info_switch():
     output_last_name_label = ttk.Label(teacher_info_frame, text='Nazwisko', font=('Open Sans', 12), bootstyle='default')
     output_last_name_label.grid(row=8, column=3, sticky='w')
 
-    output_last_name = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    output_last_name.configure(state=f'{disabled_state}')
+    output_last_name = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    output_last_name.insert('end', last_name_var)
+    output_last_name.configure(state=f'{readonly_state}')
     output_last_name.grid(row=9, column=3, sticky='w')
 
     ## output_street
@@ -1153,8 +1439,9 @@ def teacher_info_switch():
     output_street_label = ttk.Label(teacher_info_frame, text='Ulica', font=('Open Sans', 12), bootstyle='default')
     output_street_label.grid(row=8, column=4, sticky='w')
 
-    output_street = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=30)
-    output_street.configure(state=f'{disabled_state}')
+    output_street = ttk.Entry(teacher_info_frame, bootstyle='default', width=30)
+    output_street.insert('end', street_var)
+    output_street.configure(state=f'{readonly_state}')
     output_street.grid(row=9, column=4, sticky='w')
 
     ## output_building_no
@@ -1163,8 +1450,9 @@ def teacher_info_switch():
                                          bootstyle='default')
     output_building_no_label.grid(row=11, column=0, sticky='w')
 
-    output_building_no = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    output_building_no.configure(state=f'{disabled_state}')
+    output_building_no = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    output_building_no.insert('end', building_no_var)
+    output_building_no.configure(state=f'{readonly_state}')
     output_building_no.grid(row=12, column=0, sticky='w')
 
     ## local_no_output
@@ -1172,8 +1460,9 @@ def teacher_info_switch():
     local_no_output_label = ttk.Label(teacher_info_frame, text='Nr lokalu', font=('Open Sans', 12), bootstyle='default')
     local_no_output_label.grid(row=11, column=2, sticky='w')
 
-    local_no_output = ttk.Entry(teacher_info_frame, bootstyle='default', state='readonly', width=15)
-    local_no_output.configure(state=f'{disabled_state}')
+    local_no_output = ttk.Entry(teacher_info_frame, bootstyle='default', width=15)
+    local_no_output.insert('end', local_no_var)
+    local_no_output.configure(state=f'{readonly_state}')
     local_no_output.grid(row=12, column=2, sticky='w')
 
     ## city_output
