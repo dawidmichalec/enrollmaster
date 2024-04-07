@@ -212,13 +212,20 @@ def new_student_switch():
     start_date_label = ttk.Label(new_student_frame, text="Data rozpoczęcia", font=('Open Sans', 12), bootstyle='default')
     start_date_label.grid(row=20, column=0, sticky='w')
 
-    start_date = ttk.Entry(new_student_frame, bootstyle='default', state='readonly', width=15)
+    start_date_var = ''
+
+    start_date = ttk.Entry(new_student_frame, bootstyle='default', width=15)
+    start_date.insert('end', start_date_var)
+    start_date.configure(state='readonly')
     start_date.grid(row=21, column=0, sticky='w')
 
     end_date_label = ttk.Label(new_student_frame, text="Data zakończenia", font=('Open Sans', 12), bootstyle='default')
     end_date_label.grid(row=20, column=2, sticky='w')
 
-    end_date = ttk.Entry(new_student_frame, bootstyle='default', state='readonly', width=15)
+    end_date_var = ''
+    end_date = ttk.Entry(new_student_frame, bootstyle='default', width=15)
+    end_date.insert('end', end_date_var)
+    end_date.configure(state='readonly')
     end_date.grid(row=21, column=2, sticky='w')
 
     ## payment
@@ -242,7 +249,11 @@ def new_student_switch():
     prize_label = ttk.Label(new_student_frame, text="Cena", font=('Open Sans', 12), bootstyle='default')
     prize_label.grid(row=20, column=4, sticky='w')
 
-    prize_entry = ttk.Entry(new_student_frame, bootstyle='default', state='readonly', width=15)
+    prize_var = ''
+
+    prize_entry = ttk.Entry(new_student_frame, bootstyle='default', width=15)
+    prize_entry.insert('end', prize_var)
+    prize_entry.configure(state='readonly')
     prize_entry.grid(row=21, column=4, sticky='w')
 
     submit_button_style = ttk.Style()
@@ -491,8 +502,6 @@ def student_info_switch():
 
     course_var = StringVar()
 
-
-
     ## course_language_output
 
     course_language_output_label = ttk.Label(student_info_frame, text='Język kursu', font=('Open Sans', 12), bootstyle='default')
@@ -635,21 +644,13 @@ def create_course_switch():
     create_course_label = ttk.Label(create_course_frame, text='STWÓRZ KURS', font=('Open Sans', 14, 'bold'), bootstyle='default')
     create_course_label.grid(row=0, column=3, sticky='w')
 
-    ## course_name
-
-    course_name_label = ttk.Label(create_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
-    course_name_label.grid(row=2, column=0, sticky='w')
-
-    course_name_entry = ttk.Entry(create_course_frame, bootstyle='light', width=30)
-    course_name_entry.grid(row=3, column=0, sticky='w')
-
     ## course_language
 
     course_language_label = ttk.Label(create_course_frame, text="Język kursu", font=('Open Sans', 12), bootstyle='default')
-    course_language_label.grid(row=2, column=2, sticky='w')
+    course_language_label.grid(row=2, column=0, sticky='w')
 
     course_language_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz język")
-    course_language_dropdown.grid(row=3, column=2, sticky='w')
+    course_language_dropdown.grid(row=3, column=0, sticky='w')
 
     course_language_dropdown_content = ttk.Menu(course_language_dropdown)
 
@@ -663,10 +664,10 @@ def create_course_switch():
     ## course_level
 
     course_level_label = ttk.Label(create_course_frame, text='Poziom', font=('Open Sans', 12), bootstyle='default')
-    course_level_label.grid(row=2, column=3, sticky='w')
+    course_level_label.grid(row=2, column=2, sticky='w')
 
     course_level_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text='Wybierz poziom')
-    course_level_dropdown.grid(row=3, column=3, sticky='w')
+    course_level_dropdown.grid(row=3, column=2, sticky='w')
 
     course_level_dropdown_content = ttk.Menu(course_level_dropdown)
 
@@ -680,10 +681,10 @@ def create_course_switch():
     ## course_mode
 
     mode_label = ttk.Label(create_course_frame, text="Tryb", font=('Open Sans', 12), bootstyle='default')
-    mode_label.grid(row=2, column=4, sticky='w')
+    mode_label.grid(row=2, column=3, sticky='w')
 
     mode_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz poziom")
-    mode_dropdown.grid(row=3, column=4, sticky='w')
+    mode_dropdown.grid(row=3, column=3, sticky='w')
 
     mode_dropdown_content = ttk.Menu(mode_dropdown)
 
@@ -704,35 +705,48 @@ def create_course_switch():
     ## start_date
 
     start_date_label = ttk.Label(create_course_frame, text='Data rozpoczęcia', font=('Open Sans', 12), bootstyle='default')
-    start_date_label.grid(row=5, column=0, sticky='w')
+    start_date_label.grid(row=2, column=4, sticky='w')
 
     start_date_entry = ttk.DateEntry(create_course_frame, bootstyle='primary')
-    start_date_entry.grid(row=6, column=0, sticky='w')
+    start_date_entry.grid(row=3, column=4, sticky='w')
 
     ## end date
 
     end_date_label = ttk.Label(create_course_frame, text='Data zakończenia', font=('Open Sans', 12), bootstyle='default')
-    end_date_label.grid(row=5, column=2, sticky='w')
+    end_date_label.grid(row=5, column=0, sticky='w')
 
     end_date_entry = ttk.DateEntry(create_course_frame, bootstyle='primary')
     end_date_entry.configure(state="readonly")
-    end_date_entry.grid(row=6, column=2, sticky='w')
+    end_date_entry.grid(row=6, column=0, sticky='w')
 
     ## teacher_selection
 
     teacher_selection_label = ttk.Label(create_course_frame, text='Nauczyciel', font=('Open Sans', 12), bootstyle='default')
-    teacher_selection_label.grid(row=5, column=3, sticky='w')
+    teacher_selection_label.grid(row=5, column=2, sticky='w')
 
     teacher_selection_dropdown = ttk.Menubutton(create_course_frame, text='Wybierz nauczyciela', bootstyle='dark')
-    teacher_selection_dropdown.grid(row=6, column=3, sticky='w')
+    teacher_selection_dropdown.grid(row=6, column=2, sticky='w')
 
     ## prize
 
     prize_label = ttk.Label(create_course_frame, text="Cena", font=('Open Sans', 12), bootstyle='default')
-    prize_label.grid(row=5, column=4, sticky='w')
+    prize_label.grid(row=5, column=3, sticky='w')
 
     prize_entry = ttk.Entry(create_course_frame, bootstyle='light', width=15)
-    prize_entry.grid(row=6, column=4, sticky='w')
+    prize_entry.grid(row=6, column=3, sticky='w')
+
+    ## course_name
+
+    course_name_label = ttk.Label(create_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
+    course_name_label.grid(row=5, column=4, sticky='w')
+
+    course_name_var = ''
+
+    course_name_entry = ttk.Entry(create_course_frame, bootstyle='light', width=30)
+    course_name_entry.insert('end', course_name_var)
+    course_name_entry.configure(state='readonly')
+    course_name_entry.grid(row=6, column=4, sticky='w')
+
 
     submit_button_style = ttk.Style()
     submit_button_style.configure('success.TButton', font=('Open Sans', 16))
@@ -787,7 +801,7 @@ def edit_course_switch():
     course_name_search_label = ttk.Label(edit_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
     course_name_search_label.grid(row=2, column=2, sticky='w')
 
-    course_name_search_entry = ttk.Entry(edit_course_frame, bootstyle='light', width=30)
+    course_name_search_entry = ttk.Entry(edit_course_frame, bootstyle='light', width=20)
     course_name_search_entry.grid(row=3, column=2, sticky='w')
 
     submit_button_style = ttk.Style()
@@ -814,9 +828,9 @@ def edit_course_switch():
     course_name_label = ttk.Label(edit_course_frame, text='Nazwa kursu', font=('Open Sans', 12), bootstyle='default')
     course_name_label.grid(row=8, column=1, sticky='w')
 
-    course_name_entry = ttk.Entry(edit_course_frame, bootstyle='default', width=30)
+    course_name_entry = ttk.Entry(edit_course_frame, bootstyle='default', width=20)
     course_name_entry.insert('end', course_name_var)
-    course_name_entry.configure(state=f'{readonly_state}')
+    course_name_entry.configure(state='readonly')
     course_name_entry.grid(row=9, column=1, sticky='w')
 
     ## course_language
@@ -1702,9 +1716,104 @@ def search_payment_switch():
     delete_pages()
     search_payment_frame = ttk.Frame(main_frame)
 
+    search_payment_frame.columnconfigure((0, 1, 2, 3, 4), weight=1, minsize=250)
+    search_payment_frame.rowconfigure(
+        (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
+        weight=1, minsize=30)
+
+    ## search_payment_label
+
     search_payment_label = ttk.Label(search_payment_frame, text='WYSZUKAJ PŁATNOŚĆ', font=('Open Sans', 14, 'bold'),
                                   bootstyle='default')
-    search_payment_label.pack()
+    search_payment_label.grid(row=0, column=2)
+
+    ## student_id
+
+    student_id_label = ttk.Label(search_payment_frame, text='ID ucznia', font=('Open Sans', 12), bootstyle='default')
+    student_id_label.grid(row=2, column=0, sticky='w')
+
+    student_id_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    student_id_entry.grid(row=3, column=0, sticky='w')
+
+    ## student_first_name
+
+    student_first_name_label = ttk.Label(search_payment_frame, text='Imię ucznia', font=('Open Sans', 12),
+                                         bootstyle='default')
+    student_first_name_label.grid(row=2, column=1, sticky='w')
+
+    student_first_name_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    student_first_name_entry.grid(row=3, column=1, sticky='w')
+
+    ## student_last_name
+
+    student_last_name_label = ttk.Label(search_payment_frame, text='Nazwisko ucznia', font=('Open Sans', 12),
+                                        bootstyle='default')
+    student_last_name_label.grid(row=2, column=2, sticky='w')
+
+    student_last_name_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    student_last_name_entry.grid(row=3, column=2, sticky='w')
+
+    ## course_id
+
+    course_id_label = ttk.Label(search_payment_frame, text='ID kursu', font=('Open Sans', 12),
+                                bootstyle='default')
+    course_id_label.grid(row=2, column=3, sticky='w')
+
+    course_id_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    course_id_entry.grid(row=3, column=3, sticky='w')
+
+    ## course_name
+
+    course_name_label = ttk.Label(search_payment_frame, text='Nazwa kursu', bootstyle='default', font=('Open Sans', 12))
+    course_name_label.grid(row=2, column=4, sticky='w')
+
+    course_name_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    course_name_entry.grid(row=3, column=4, sticky='w')
+
+    ## date_due
+
+    date_due_label = ttk.Label(search_payment_frame, text='Termin płatności', font=('Open Sans', 12),
+                                bootstyle='default')
+    date_due_label.grid(row=5, column=0, sticky='w')
+
+    date_due_entry = ttk.DateEntry(search_payment_frame, bootstyle='default')
+    date_due_entry.grid(row=6, column=0, sticky='w')
+
+    ## amount
+
+    amount_label = ttk.Label(search_payment_frame, text='Cena', font=('Open Sans', 12), bootstyle='default')
+    amount_label.grid(row=5, column=1, sticky='w')
+
+    amount_entry = ttk.Entry(search_payment_frame, bootstyle='light', width=20)
+    amount_entry.grid(row=6, column=1, sticky='w')
+
+    ## payment_status
+
+    payment_status_label = ttk.Label(search_payment_frame, text='Status płatności', font=('Open Sans', 12), bootstyle='default')
+    payment_status_label.grid(row=5, column=2, sticky='w')
+
+    payment_status = ttk.Menubutton(search_payment_frame, bootstyle='dark', text='Wybierz status')
+    payment_status.grid(row=6, column=2, sticky='w')
+
+    payment_status_content = ttk.Menu(payment_status)
+    status_var = StringVar()
+
+    for x in ['Do zapłaty', 'Zaległość', 'Zapłacone']:
+        payment_status_content.add_radiobutton(label=x, variable=status_var,
+                                                          command=lambda x=x: amend_menu_content(
+                                                              payment_status, x))
+
+    payment_status['menu'] = payment_status_content
+
+
+    ## submit button
+
+    submit_button_style = ttk.Style()
+    submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+
+    submit_button = ttk.Button(search_payment_frame, bootstyle='success', text='SZUKAJ', width=13,
+                               style='success.TButton')
+    submit_button.grid(row=8, column=2, sticky='w')
 
     search_payment_frame.pack()
 
@@ -1721,9 +1830,17 @@ def generate_report_switch():
     delete_pages()
     generate_report_frame = ttk.Frame(main_frame)
 
+    generate_report_frame.columnconfigure((0, 1, 2, 3, 4), weight=1, minsize=250)
+    generate_report_frame.rowconfigure(
+        (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
+        weight=1, minsize=30)
+
     generate_report_label = ttk.Label(generate_report_frame, text='WYGENERUJ RAPORT', font=('Open Sans', 14, 'bold'),
                                   bootstyle='default')
-    generate_report_label.pack()
+    generate_report_label.grid(row=0, column=2, sticky='w')
+
+
+
 
     generate_report_frame.pack()
 
@@ -1792,8 +1909,11 @@ payments.place(x=10, y=521)
 search_payment = ttk.Button(text='WYSZUKAJ PŁATNOŚĆ', bootstyle='info', width=22, command=lambda: search_payment_switch())
 search_payment.place(x=10, y=559)
 
+edit_payment = ttk.Button(text='EDYTUJ PŁATNOŚĆ', bootstyle='info', width=22, command=lambda: edit_payment_swich())
+edit_payment.place(x=10, y=597)
+
 generate_report = ttk.Button(text='WYGENERUJ RAPORT', bootstyle='info', width=22, command=lambda: generate_report_switch())
-generate_report.place(x=10, y=597)
+generate_report.place(x=10, y=635)
 
 """
 Main frame that will serve as the base for other pages.
