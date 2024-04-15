@@ -1,5 +1,6 @@
 from tkinter import *
 import ttkbootstrap as ttk
+from datetime import datetime, timedelta
 
 root = ttk.Window(themename='solar')
 root.title('Enroll Master')
@@ -21,6 +22,10 @@ sub_button_style.configure('info.TButton', font=('Open Sans', 14))
 Function that switches to new student creation frame. It also contains all the information about the design of this frame.
 """
 
+def new_student_data_list(x):
+    for i in x:
+        print(i)
+
 def new_student_switch():
     delete_pages()
     new_student_frame = ttk.Frame(main_frame)
@@ -35,6 +40,7 @@ def new_student_switch():
 
     first_name_label = ttk.Label(new_student_frame, text="Imię", font=('Open Sans', 12), bootstyle='default')
     first_name_label.grid(row=2, column=0, sticky='w')
+
 
     first_name = ttk.Entry(new_student_frame, width=30, bootstyle='light')
     first_name.grid(row=3, column=0)
@@ -132,14 +138,23 @@ def new_student_switch():
     document_type_label = ttk.Label(new_student_frame, text="Rodzaj dokumentu", font=('Open Sans', 12), bootstyle='default')
     document_type_label.grid(row=14, column=3, sticky='w')
 
-    document_type = ttk.Menubutton(new_student_frame, bootstyle='dark', text='Wybierz dokument')
+    def on_document_type_select():
+        selected_document_type = document_var.get()
+        print("Selected document type:", selected_document_type)
+        amend_menu_content(document_type, selected_document_type)
+        return selected_document_type
+
+    document_type = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz dokument")
     document_type.grid(row=15, column=3, sticky='w')
 
     document_type_content = ttk.Menu(document_type)
 
-    item_var = StringVar()
-    for x in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
-        document_type_content.add_radiobutton(label=x, variable=item_var, command=lambda x=x:amend_menu_content(document_type, x))
+    document_var = ttk.StringVar()
+    document_var.set("Dowód osobisty")  # Set default document_type
+
+    for document in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
+        document_type_content.add_radiobutton(label=document, variable=document_var, value=document,
+                                              command=on_document_type_select)
 
     document_type['menu'] = document_type_content
 
@@ -148,14 +163,23 @@ def new_student_switch():
     language_label = ttk.Label(new_student_frame, text="Język kursu", font=('Open Sans', 12), bootstyle='default')
     language_label.grid(row=17, column=0, sticky='w')
 
+    def on_language_select():
+        selected_language = language_var.get()
+        print("Selected language:", selected_language)
+        amend_menu_content(language_dropdown, selected_language)
+        return selected_language
+
     language_dropdown = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz język")
     language_dropdown.grid(row=18, column=0, sticky='w')
 
     language_dropdown_content = ttk.Menu(language_dropdown)
 
-    language_var = StringVar()
-    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
-        language_dropdown_content.add_radiobutton(label=x, variable=language_var, command=lambda x=x:amend_menu_content(language_dropdown, x))
+    language_var = ttk.StringVar()
+    language_var.set("Angielski")  # Set default payment method
+
+    for language in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        language_dropdown_content.add_radiobutton(label=language, variable=language_var, value=language,
+                                                  command=on_language_select)
 
     language_dropdown['menu'] = language_dropdown_content
 
@@ -164,15 +188,23 @@ def new_student_switch():
     level_label = ttk.Label(new_student_frame, text="Poziom", font=('Open Sans', 12), bootstyle='default')
     level_label.grid(row=17, column=2, sticky='w')
 
+    def on_level_select():
+        selected_level = level_var.get()
+        print("Selected level:", selected_level)
+        amend_menu_content(level_dropdown, selected_level)
+        return selected_level
+
     level_dropdown = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz poziom")
     level_dropdown.grid(row=18, column=2, sticky='w')
 
     level_dropdown_content = ttk.Menu(level_dropdown)
 
     level_var = StringVar()
+    level_var.set("Początkujący")  # Set default payment method
 
-    for x in ['Początkujący', 'Zaawansowany']:
-        level_dropdown_content.add_radiobutton(label=x, variable=level_var, command=lambda x=x:amend_menu_content(level_dropdown, x))
+    for level in ['Początkujący', 'Zaawansowany']:
+        level_dropdown_content.add_radiobutton(label=level, variable=level_var, value=level,
+                                               command=on_level_select)
 
     level_dropdown['menu'] = level_dropdown_content
 
@@ -182,16 +214,23 @@ def new_student_switch():
     mode_label = ttk.Label(new_student_frame, text="Tryb", font=('Open Sans', 12), bootstyle='default')
     mode_label.grid(row=17, column=3, sticky='w')
 
-    mode_dropdown = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz poziom")
+    def on_mode_select():
+        selected_mode = mode_var.get()
+        print("Selected mode:", selected_mode)
+        amend_menu_content(mode_dropdown, selected_mode)
+        return selected_mode
+
+    mode_dropdown = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz tryb")
     mode_dropdown.grid(row=18, column=3, sticky='w')
 
     mode_dropdown_content = ttk.Menu(mode_dropdown)
 
     mode_var = StringVar()
+    mode_var.set("Normalny")  # Set default mode
 
-    for x in ['Normalny', 'Przyspieszony']:
-        mode_dropdown_content.add_radiobutton(label=x, variable=mode_var,
-                                               command=lambda x=x: amend_menu_content(mode_dropdown, x))
+    for mode in ['Normalny', 'Przyspieszony']:
+        mode_dropdown_content.add_radiobutton(label=mode, variable=mode_var, value=mode,
+                                              command=on_mode_select)
 
     mode_dropdown['menu'] = mode_dropdown_content
 
@@ -209,40 +248,46 @@ def new_student_switch():
 
     course_var = StringVar()
 
+    ## start_date
+
     start_date_label = ttk.Label(new_student_frame, text="Data rozpoczęcia", font=('Open Sans', 12), bootstyle='default')
     start_date_label.grid(row=20, column=0, sticky='w')
 
-    start_date_var = ''
+    start_date_entry = ttk.DateEntry(new_student_frame, bootstyle='primary')
+    start_date_entry.configure(state='readonly')
+    start_date_entry.grid(row=21, column=0, sticky='w')
 
-    start_date = ttk.Entry(new_student_frame, bootstyle='default', width=15)
-    start_date.insert('end', start_date_var)
-    start_date.configure(state='readonly')
-    start_date.grid(row=21, column=0, sticky='w')
+    ## end_date
 
     end_date_label = ttk.Label(new_student_frame, text="Data zakończenia", font=('Open Sans', 12), bootstyle='default')
     end_date_label.grid(row=20, column=2, sticky='w')
 
-    end_date_var = ''
-    end_date = ttk.Entry(new_student_frame, bootstyle='default', width=15)
-    end_date.insert('end', end_date_var)
-    end_date.configure(state='readonly')
-    end_date.grid(row=21, column=2, sticky='w')
+    end_date_entry = ttk.DateEntry(new_student_frame, bootstyle='primary')
+    end_date_entry.configure(state='readonly')
+    end_date_entry.grid(row=21, column=2, sticky='w')
 
     ## payment
 
     payment_label = ttk.Label(new_student_frame, text="Płatność", font=('Open Sans', 12), bootstyle='default')
     payment_label.grid(row=20, column=3, sticky='w')
 
+    def on_payment_select():
+        selected_payment_method = payment_var.get()
+        print("Selected payment method:", selected_payment_method)
+        amend_menu_content(payment_dropdown, selected_payment_method)
+        return selected_payment_method
+
     payment_dropdown = ttk.Menubutton(new_student_frame, bootstyle='dark', text="Wybierz sposób płatności")
     payment_dropdown.grid(row=21, column=3, sticky='w')
 
     payment_dropdown_content = ttk.Menu(payment_dropdown)
 
-    payment_var = StringVar()
+    payment_var = ttk.StringVar()
+    payment_var.set("W placówce")  # Set default payment method
 
-    for x in ['W placówce', 'Przelew']:
-        payment_dropdown_content.add_radiobutton(label=x, variable=payment_var,
-                                              command=lambda x=x: amend_menu_content(payment_dropdown, x))
+    for payment_method in ['W placówce', 'Przelew']:
+        payment_dropdown_content.add_radiobutton(label=payment_method, variable=payment_var, value=payment_method,
+                                                 command=on_payment_select)
 
     payment_dropdown['menu'] = payment_dropdown_content
 
@@ -597,6 +642,7 @@ def student_info_switch():
     When clicked, the entries change status from readonly to editable. 
     """
 
+
     edit_button_style = ttk.Style()
     edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
 
@@ -650,61 +696,78 @@ def create_course_switch():
 
     ## course_language
 
-    course_language_label = ttk.Label(create_course_frame, text="Język kursu", font=('Open Sans', 12), bootstyle='default')
-    course_language_label.grid(row=2, column=0, sticky='w')
+    language_label = ttk.Label(create_course_frame, text="Język kursu", font=('Open Sans', 12), bootstyle='default')
+    language_label.grid(row=2, column=0, sticky='w')
 
-    course_language_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz język")
-    course_language_dropdown.grid(row=3, column=0, sticky='w')
+    def on_language_select():
+        selected_language = language_var.get()
+        print("Selected language:", selected_language)
+        amend_menu_content(language_dropdown, selected_language)
+        return selected_language
 
-    course_language_dropdown_content = ttk.Menu(course_language_dropdown)
+    language_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz język")
+    language_dropdown.grid(row=3, column=0, sticky='w')
 
-    course_language_var = StringVar()
-    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
-        course_language_dropdown_content.add_radiobutton(label=x, variable=course_language_var,
-                                                  command=lambda x=x: amend_menu_content(course_language_dropdown, x))
+    language_dropdown_content = ttk.Menu(language_dropdown)
 
-    course_language_dropdown['menu'] = course_language_dropdown_content
+    language_var = ttk.StringVar()
+    language_var.set("Angielski")  # Set default payment method
+
+    for language in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        language_dropdown_content.add_radiobutton(label=language, variable=language_var, value=language,
+                                                  command=on_language_select)
+
+    language_dropdown['menu'] = language_dropdown_content
 
     ## course_level
 
     course_level_label = ttk.Label(create_course_frame, text='Poziom', font=('Open Sans', 12), bootstyle='default')
     course_level_label.grid(row=2, column=2, sticky='w')
 
-    course_level_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text='Wybierz poziom')
-    course_level_dropdown.grid(row=3, column=2, sticky='w')
+    def on_level_select():
+        selected_level = level_var.get()
+        print("Selected level:", selected_level)
+        amend_menu_content(level_dropdown, selected_level)
+        return selected_level
 
-    course_level_dropdown_content = ttk.Menu(course_level_dropdown)
+    level_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text='Wybierz poziom')
+    level_dropdown.grid(row=3, column=2, sticky='w')
 
-    course_level_var= StringVar()
+    level_dropdown_content = ttk.Menu(level_dropdown)
 
-    for x in ['Początkujący', 'Zaawansowany']:
-        course_level_dropdown_content.add_radiobutton(label=x, variable=course_level_var, command=lambda x=x: amend_menu_content(course_level_dropdown, x))
+    level_var = StringVar()
+    level_var.set("Początkujący")  # Set default payment method
 
-    course_level_dropdown['menu'] = course_level_dropdown_content
+    for level in ['Początkujący', 'Zaawansowany']:
+        level_dropdown_content.add_radiobutton(label=level, variable=level_var, value=level,
+                                               command=on_level_select)
+
+    level_dropdown['menu'] = level_dropdown_content
 
     ## course_mode
 
     mode_label = ttk.Label(create_course_frame, text="Tryb", font=('Open Sans', 12), bootstyle='default')
     mode_label.grid(row=2, column=3, sticky='w')
 
-    mode_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz poziom")
+    def on_mode_select():
+        selected_mode = mode_var.get()
+        print("Selected mode:", selected_mode)
+        amend_menu_content(mode_dropdown, selected_mode)
+        return selected_mode
+
+    mode_dropdown = ttk.Menubutton(create_course_frame, bootstyle='dark', text="Wybierz tryb")
     mode_dropdown.grid(row=3, column=3, sticky='w')
 
     mode_dropdown_content = ttk.Menu(mode_dropdown)
 
     mode_var = StringVar()
+    mode_var.set("Normalny")  # Set default mode
 
-    choice = ""
-
-    for x in ['Normalny', 'Przyspieszony']:
-        mode_dropdown_content.add_radiobutton(label=x, variable=mode_var,
-                                              command=lambda x=x: amend_menu_content(mode_dropdown, x))
-
-
+    for mode in ['Normalny', 'Przyspieszony']:
+        mode_dropdown_content.add_radiobutton(label=mode, variable=mode_var, value=mode,
+                                              command=on_mode_select)
 
     mode_dropdown['menu'] = mode_dropdown_content
-
-
 
     ## start_date
 
@@ -1237,15 +1300,22 @@ def add_a_teacher_switch():
                                     bootstyle='default')
     document_type_label.grid(row=14, column=2, sticky='w')
 
+    def on_document_type_select(): 
+        selected_document_type = document_var.get()
+        print("Selected document type:", selected_document_type )
+        amend_menu_content(document_type, selected_document_type )
+        return selected_document_type
+
     document_type = ttk.Menubutton(add_a_teacher_frame, bootstyle='dark', text='Wybierz dokument')
     document_type.grid(row=15, column=2, sticky='w')
 
     document_type_content = ttk.Menu(document_type)
 
-    item_var = StringVar()
-    for x in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
-        document_type_content.add_radiobutton(label=x, variable=item_var,
-                                              command=lambda x=x: amend_menu_content(document_type, x))
+    document_var = StringVar()
+    document_var.set("Dowód osobisty")
+    for document in ['Dowód osobisty', 'Paszport', 'Karta pobytu']:
+        document_type_content.add_radiobutton(label=document, variable=document_var, value=document,
+                                              command=on_document_type_select)
 
     document_type['menu'] = document_type_content
 
@@ -1254,15 +1324,22 @@ def add_a_teacher_switch():
     type_of_contract_label = ttk.Label(add_a_teacher_frame, text="Rodzaj umowy", font=('Open Sans', 12), bootstyle='default')
     type_of_contract_label.grid(row=14, column=3, sticky='w')
 
+    def on_contract_type_select():
+        selected_contract_type = type_var.get()
+        print("Selected type of contract:", selected_contract_type)
+        amend_menu_content(type_of_contract, selected_contract_type)
+        return selected_contract_type
+
     type_of_contract = ttk.Menubutton(add_a_teacher_frame, bootstyle='dark', text='Wybierz umowę')
     type_of_contract.grid(row=15, column=3, sticky='w')
 
     type_of_contract_content = ttk.Menu(type_of_contract)
 
     type_var = StringVar()
+    type_var.set("Umowa o pracę")
 
-    for x in ['Umowa o pracę', 'Umowa zlecenie']:
-        type_of_contract_content.add_radiobutton(label=x, variable=type_var, command=lambda x=x: amend_menu_content(type_of_contract, x))
+    for contract in ['Umowa o pracę', 'Umowa zlecenie']:
+        type_of_contract_content.add_radiobutton(label=contract, variable=type_var, value=contract, command=on_contract_type_select)
 
     type_of_contract['menu'] = type_of_contract_content
 
@@ -1272,15 +1349,22 @@ def add_a_teacher_switch():
     type_of_employment_label = ttk.Label(add_a_teacher_frame, text='Rodzaj zatrudnienia', font=('Open Sans', 12), bootstyle='default')
     type_of_employment_label.grid(row=14, column=4, sticky='w')
 
+    def on_employment_type_select():
+        selected_employment_type = employment_var.get()
+        print("Selected type of employment:", selected_employment_type)
+        amend_menu_content(type_of_employment, selected_employment_type)
+        return selected_employment_type
+
     type_of_employment = ttk.Menubutton(add_a_teacher_frame, bootstyle='dark', text='Wybierz')
     type_of_employment.grid(row=15, column=4, sticky='w')
 
     type_of_employment_content = ttk.Menu(type_of_employment)
 
     employment_var = StringVar()
+    employment_var.set("Pełny etat")
 
-    for x in ['Pełny etat', 'Pół etatu']:
-        type_of_employment_content.add_radiobutton(label=x, variable=employment_var, command=lambda x=x:amend_menu_content(type_of_employment, x))
+    for employment in ['Pełny etat', 'Pół etatu']:
+        type_of_employment_content.add_radiobutton(label=employment, variable=employment_var, value=employment ,command=on_employment_type_select)
 
     type_of_employment['menu'] = type_of_employment_content
 
@@ -1319,15 +1403,22 @@ def add_a_teacher_switch():
                                       bootstyle='default')
     language_to_teach_label.grid(row=17, column=4, sticky='w')
 
+    def on_language_to_teach_select():
+        selected_language = lang_var.get()
+        print("Selected language:", selected_language)
+        amend_menu_content(language_to_teach, selected_language)
+        return selected_language
+
     language_to_teach = ttk.Menubutton(add_a_teacher_frame, bootstyle='dark', text='Wybierz')
     language_to_teach.grid(row=18, column=4, sticky='w')
 
     language_to_teach_content = ttk.Menu(language_to_teach)
 
     lang_var = StringVar()
-
-    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
-        language_to_teach_content.add_radiobutton(label=x, variable=lang_var, command=lambda x=x:amend_menu_content(language_to_teach, x))
+    lang_var.set("Angielski")
+    for language in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        language_to_teach_content.add_radiobutton(label=language, variable=lang_var, value=language,
+                                                  command=on_language_to_teach_select)
 
     language_to_teach['menu'] = language_to_teach_content
 
@@ -1819,6 +1910,12 @@ def search_payment_switch():
                                style='success.TButton')
     submit_button.grid(row=8, column=2, sticky='w')
 
+
+    ## output label
+
+    output_label = ttk.Label(search_payment_frame, font=('Open Sans',12), bootstyle='default', text='asdfasdf')
+    output_label.grid(row=11, column=2, sticky='w')
+
     search_payment_frame.pack()
 
 
@@ -2050,6 +2147,100 @@ def generate_report_switch():
                                   bootstyle='default')
     generate_report_label.grid(row=0, column=2, sticky='w')
 
+    ## start_date
+
+    start_date_label = ttk.Label(generate_report_frame, text='Data od', bootstyle='default', font=('Open Sans', 12))
+    start_date_label.grid(row=2, column=0, sticky='w')
+
+    start_date_entry = ttk.DateEntry(generate_report_frame, bootstyle='primary')
+    start_date_entry.grid(row=3, column=0, sticky='w')
+
+    ## end_date
+
+    end_date_label = ttk.Label(generate_report_frame, text='Data do', bootstyle='default', font=('Open Sans', 12))
+    end_date_label.grid(row=2, column=1, sticky='w')
+
+    end_date_entry = ttk.DateEntry(generate_report_frame, bootstyle='primary')
+    end_date_entry.grid(row=3, column=1, sticky='w')
+
+    ## language
+
+    course_language_label = ttk.Label(generate_report_frame, text="Język kursu", font=('Open Sans', 12),
+                                      bootstyle='default')
+    course_language_label.grid(row=2, column=2, sticky='w')
+
+    course_language_dropdown = ttk.Menubutton(generate_report_frame, bootstyle='dark', text="Wybierz język")
+    course_language_dropdown.grid(row=3, column=2, sticky='w')
+
+    course_language_dropdown_content = ttk.Menu(course_language_dropdown)
+
+    course_language_var = StringVar()
+    for x in ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']:
+        course_language_dropdown_content.add_radiobutton(label=x, variable=course_language_var,
+                                                         command=lambda x=x: amend_menu_content(
+                                                             course_language_dropdown, x))
+
+    course_language_dropdown['menu'] = course_language_dropdown_content
+
+    ## payment_status
+
+    payment_status_label = ttk.Label(generate_report_frame, text='Status płatności', font=('Open Sans', 12),
+                                     bootstyle='default')
+    payment_status_label.grid(row=2, column=3, sticky='w')
+
+    payment_status = ttk.Menubutton(generate_report_frame, bootstyle='dark', text='Wybierz status')
+    payment_status.grid(row=3, column=3, sticky='w')
+
+    payment_status_content = ttk.Menu(payment_status)
+    status_var_1 = StringVar()
+
+    for x in ['Do zapłaty', 'Zaległość', 'Zapłacone']:
+        payment_status_content.add_radiobutton(label=x, variable=status_var_1,
+                                               command=lambda x=x: amend_menu_content(
+                                                   payment_status, x))
+
+    payment_status['menu'] = payment_status_content
+
+    ## payment_type
+
+    payment_type_label = ttk.Label(generate_report_frame, text="Sposób płatności", font=('Open Sans', 12),
+                                   bootstyle='default')
+    payment_type_label.grid(row=2, column=4, sticky='w')
+
+    payment_dropdown = ttk.Menubutton(generate_report_frame, bootstyle='dark', text="Wybierz sposób płatności")
+    payment_dropdown.grid(row=3, column=4, sticky='w')
+
+    payment_dropdown_content = ttk.Menu(payment_dropdown)
+
+    payment_var = StringVar()
+
+    for x in ['W placówce', 'Przelew']:
+        payment_dropdown_content.add_radiobutton(label=x, variable=payment_var,
+                                                 command=lambda x=x: amend_menu_content(payment_dropdown, x))
+
+    payment_dropdown['menu'] = payment_dropdown_content
+
+    ## submit_button
+
+    submit_button_style = ttk.Style()
+    submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+
+    submit_button = ttk.Button(generate_report_frame, bootstyle='success', text='SZUKAJ', width=13,
+                               style='success.TButton')
+    submit_button.grid(row=6, column=2, sticky='w')
+
+    ## export_button
+
+    export_button_style = ttk.Style()
+    export_button_style.configure('primary.TButton', font=('Open Sans', 15))
+
+    export_button = ttk.Button(generate_report_frame, bootstyle='primary', text='CSV', width=13, style='primary.TButton')
+    export_button.grid(row=6, column=3, sticky='w')
+
+    ## output_label
+
+    output_label = ttk.Label(generate_report_frame, font=('Open Sans', 12), bootstyle='default', text='asdfasdf')
+    output_label.grid(row=9, column=2, sticky='w')
 
 
 
