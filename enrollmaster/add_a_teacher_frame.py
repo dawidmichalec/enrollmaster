@@ -317,17 +317,15 @@ class AddATeacherFrame(ttk.Frame):
                     language_to_teach, status_of_employment, employment_start
                 )
                 VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s. %s, %s
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )
-                RETURNING teacher_id;
                 """,
                 (
                     self.first_name.get(), self.last_name.get(), self.street.get(), self.building_no.get(),
-                    local_no_value,
-                    self.city.get(), self.postal_code.get(), self.country.get(),
+                    local_no_value, self.city.get(), self.postal_code.get(), self.country.get(),
                     email_value, self.phone_number.get(), self.personal_id.get(), self.document_no.get(),
                     self.on_document_type_select(), self.on_contract_type_select(), self.on_employment_type_select(),
-                    self.salary.get(), self.native_language_entry.get(), self.language_to_teach.get(),
+                    self.salary.get(), self.native_language_entry.get(), self.on_language_to_teach_select(),
                     'Aktywny', self.employment_start_entry.entry.get()
                 )
             )
@@ -335,6 +333,8 @@ class AddATeacherFrame(ttk.Frame):
             conn.commit()
             cur.close()
             conn.close()
+
+
 
     """
     Functions for dropdown selection.
@@ -352,17 +352,17 @@ class AddATeacherFrame(ttk.Frame):
         self.amend_menu_content_func(self.type_of_contract, selected_contract_type)
         return selected_contract_type
 
-    def on_employment_type_select(self):
-        selected_employment_type = self.employment_var.get()
-        print("Selected type of employment:", selected_employment_type)
-        self.amend_menu_content_func(self.type_of_employment, selected_employment_type)
-        return selected_employment_type
-
     def on_language_to_teach_select(self):
         selected_language = self.lang_var.get()
         print("Selected language:", selected_language)
         self.amend_menu_content_func(self.language_to_teach, selected_language)
         return selected_language
+
+    def on_employment_type_select(self):
+        selected_employment_type = self.employment_var.get()
+        print("Selected type of employment:", selected_employment_type)
+        self.amend_menu_content_func(self.type_of_employment, selected_employment_type)
+        return selected_employment_type
 
     """
     Validation functions
@@ -578,6 +578,7 @@ class AddATeacherFrame(ttk.Frame):
     def validation_on_submission(self):
 
         regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
 
         if not self.validate_input(self.first_name_var.get(), 64, "Imię", allow_empty=False):
             return False
@@ -597,20 +598,30 @@ class AddATeacherFrame(ttk.Frame):
             return False
         if not self.validate_input(self.email_var.get(), 64, "Adres email", allow_empty=False):
             return False
+        elif re.match(pattern, self.email_var.get()) is None:
+            self.show_custom_messagebox("Format adresu email jest niepoprawny\nPopraw formularz", "Błąd")
+            return False
         if not self.validate_phone():
             self.show_custom_messagebox(
                 "Pole 'Nr telefonu' nie może zawierać liter ani znaków specjalnych\nPopraw formularz", "Błąd")
             return False
+        elif len(self.phone_var.get()) == 0:
+            self.show_custom_messagebox("Pole 'Nr telefonu' nie może być puste\nPopraw formularz")
         if not self.validate_input(self.native_language_var.get(), 16, "Język ojczysty", allow_empty=False, regex=regex):
             return False
         if not self.validate_personal_id():
             self.show_custom_messagebox("Pole 'PESEL' nie może zawierać liter\nPopraw formularz", "Błąd")
             return False
-        if not validate_input(self.document_no_var.get(), 32, "Nr dokumentu", allow_empty=False, regex=regex):
+        elif len(self.personal_id_var.get()) == 0:
+            self.show_custom_messagebox("Pole PESEL nie może być puste\nPopraw formularz")
             return False
-        if not self.validate_salary():
+        if not self.validate_input(self.document_no_var.get(), 32, "Nr dokumentu", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_salary() or self.salary_var == '':
             self.show_custom_messagebox("Pole 'Wypłata' zawiera błędy\nPopraw formularz", "Błąd")
             return False
+        elif len(self.salary_var.get()) == 0:
+            self.show_custom_messagebox("Pole 'Wypłata' nie może być puste\nPopraw formularz")
 
         return True
 
