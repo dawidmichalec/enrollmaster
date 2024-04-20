@@ -291,69 +291,50 @@ class AddATeacherFrame(ttk.Frame):
 
     def submit_data(self):
 
-        # Connect to the database
-        conn = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
-        )
+        validation = self.validation_on_submission()
 
-        cur = conn.cursor()
+        if validation is True:
 
-        local_no_value = self.local_no.get() or None
+            # Connect to the database
+            conn = psycopg2.connect(
+                database='enroll_proto',
+                host='localhost',
+                user='postgres',
+                password='kulek',
+                port='5432'
+            )
 
-        cur.execute(
-            """
-            INSERT INTO teacher_personal_info (
-                first_name, last_name, street, building_no, local_no, city, postal_code, country, email, phone, personal_id,
-                document_no, document_type, type_of_contract, type_of_employment, salary, status_of_employment, employment_start
-            )
-            VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-            )
-            RETURNING teacher_id;
-            """,
-            (
-                self.first_name.get(), self.last_name.get(), self.street.get(), self.building_no.get(),
-                local_no_value,  # Pass None if local_no is not provided
-                self.city.get(), self.postal_code.get(), self.country.get(),
-                self.email.get(), self.phone_number.get(), self.personal_id.get(), self.document_no.get(),
-                self.on_document_type_select(), self.on_contract_type_select(), self.on_employment_type_select(),
-                self.salary.get(), 'Aktywny', self.employment_start_entry.entry.get()
-            )
-        )
+            cur = conn.cursor()
 
-        # Fetch the inserted teacher_id, first_name, and last_name
-        cur.execute(
-            """
-            SELECT teacher_id, first_name, last_name
-            FROM teacher_personal_info
-            ORDER BY teacher_id DESC
-            LIMIT 1;
-            """
-        )
-        teacher_info = cur.fetchone()
+            local_no_value = self.local_no.get() or None
+            email_value = self.email.get() or None
 
-        # Insert data into teacher_language_skills table
-        cur.execute(
-            """
-            INSERT INTO teacher_language_skills (
-                teacher_id, first_name, last_name, native_language, language_to_teach
+            cur.execute(
+                """
+                INSERT INTO teachers (
+                    first_name, last_name, street, building_no, local_no, city, postal_code, country, email, phone, personal_id,
+                    document_no, document_type, type_of_contract, type_of_employment, salary, native_language, 
+                    language_to_teach, status_of_employment, employment_start
+                )
+                VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s. %s, %s
+                )
+                RETURNING teacher_id;
+                """,
+                (
+                    self.first_name.get(), self.last_name.get(), self.street.get(), self.building_no.get(),
+                    local_no_value,
+                    self.city.get(), self.postal_code.get(), self.country.get(),
+                    email_value, self.phone_number.get(), self.personal_id.get(), self.document_no.get(),
+                    self.on_document_type_select(), self.on_contract_type_select(), self.on_employment_type_select(),
+                    self.salary.get(), self.native_language_entry.get(), self.language_to_teach.get(),
+                    'Aktywny', self.employment_start_entry.entry.get()
+                )
             )
-            VALUES (
-                %s, %s, %s, %s, %s
-            );
-            """,
-            (
-                teacher_info[0], teacher_info[1], teacher_info[2], self.native_language_entry.get(),
-                self.on_language_to_teach_select()
-            )
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
+
+            conn.commit()
+            cur.close()
+            conn.close()
 
     """
     Functions for dropdown selection.
@@ -517,7 +498,10 @@ class AddATeacherFrame(ttk.Frame):
 
         for i in phone:
             if i.isdigit() is False:
-                self.show_custom_messagebox("Pole 'Nr telefonu nie może zawierać liter", "Błąd")
+                self.show_custom_messagebox("Pole 'Nr telefonu nie może zawierać liter ani znaków specjalnych", "Błąd")
+                return False
+            else:
+                return True
 
     def validate_personal_id(self, *args):
         pid = self.personal_id_var.get()
@@ -525,6 +509,9 @@ class AddATeacherFrame(ttk.Frame):
         for i in pid:
             if i.isdigit() is False:
                 self.show_custom_messagebox("Pole 'PESEL' nie może zawierać liter", "Błąd")
+                return False
+            else:
+                return True
 
     def validate_document_no(self, *args):
         doc_no = self.document_no_var.get()
@@ -532,7 +519,7 @@ class AddATeacherFrame(ttk.Frame):
         regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
 
         if (regex.search(doc_no) == None):
-            print("String is accepted")
+            pass
         else:
             self.show_custom_messagebox("Pole 'Nr dokumentu' nie może zawierać znaków specjalnych", "Błąd")
 
@@ -545,15 +532,21 @@ class AddATeacherFrame(ttk.Frame):
         for i in salary:
             if i == " ":
                 self.show_custom_messagebox("Pole 'Wypłata' nie może zawierać spacji", "Błąd")
+                return False
             elif i.isdigit() is False and i != '.':
                 self.show_custom_messagebox("Pole 'Wypłata' nie może zawierać liter ani znaków specjalnych", "Błąd")
+                return False
             elif salary[0] == '.':
                 self.show_custom_messagebox("Wartość pola 'Wypłata' nie może zaczynać się od kropki", "Błąd")
+                return False
             else:
                 d = decimal.Decimal(salary)
                 if d.as_tuple().exponent == -1 or d.as_tuple().exponent <= -3:
                     self.show_custom_messagebox("Pole 'Wypłata' musi zawierać dwa miejsca po przecinku",
                                                 "Błąd")
+                    return False
+
+            return True
 
     def validate_native_language(self, *args):
         native_language = self.native_language_var.get()
@@ -571,9 +564,60 @@ class AddATeacherFrame(ttk.Frame):
         if any(chr.isdigit() for chr in native_language):
             self.show_custom_messagebox("Pole 'Język ojczysty' nie może zawierać liczb", "Błąd")
 
+    def validate_input(self,input_value, max_length, error_message, allow_empty=False, regex=None):
+        if not allow_empty and not input_value.strip():
+            self.show_custom_messagebox(f"Pole '{error_message}' nie może być puste\nPopraw formularz", "Błąd")
+            return False
+        if len(input_value) > max_length:
+            self.show_custom_messagebox(error_message, "Błąd")
+            return False
+        if regex and regex.search(input_value):
+            self.show_custom_messagebox(error_message, "Błąd")
+            return False
+        return True
+    def validation_on_submission(self):
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if not self.validate_input(self.first_name_var.get(), 64, "Imię", allow_empty=False):
+            return False
+        if not self.validate_input(self.last_name_var.get(), 64, "Nazwisko", allow_empty=False):
+            return False
+        if not self.validate_input(self.street_var.get(), 128, "Ulica", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.building_no_var.get(), float('inf'), "Nr domu", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.local_no_var.get(), float('inf'), "Nr lokalu", allow_empty=True, regex=regex):
+            return False
+        if not self.validate_input(self.city_var.get(), 64, "Miasto", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.postal_code_var.get(), 8, "Kod pocztowy", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.country_var.get(), 64, "Państwo", allow_empty=False):
+            return False
+        if not self.validate_input(self.email_var.get(), 64, "Adres email", allow_empty=False):
+            return False
+        if not self.validate_phone():
+            self.show_custom_messagebox(
+                "Pole 'Nr telefonu' nie może zawierać liter ani znaków specjalnych\nPopraw formularz", "Błąd")
+            return False
+        if not self.validate_input(self.native_language_var.get(), 16, "Język ojczysty", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_personal_id():
+            self.show_custom_messagebox("Pole 'PESEL' nie może zawierać liter\nPopraw formularz", "Błąd")
+            return False
+        if not validate_input(self.document_no_var.get(), 32, "Nr dokumentu", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_salary():
+            self.show_custom_messagebox("Pole 'Wypłata' zawiera błędy\nPopraw formularz", "Błąd")
+            return False
+
+        return True
+
     """
     Function that allows to generate a custom messagebox and control its position. 
     """
+
     def show_custom_messagebox(self, message, title):
         custom_mb = Toplevel(self.master)
         custom_mb.title(title)
