@@ -20,7 +20,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## course_language
 
-        language_label = ttk.Label(self, text="Język kursu", font=('Open Sans', 12), bootstyle='default')
+        language_label = ttk.Label(self, text="Język kursu*", font=('Open Sans', 12), bootstyle='default')
         language_label.grid(row=2, column=0, sticky='w')
 
         self.language_dropdown = ttk.Menubutton(self, bootstyle='dark', text="Wybierz język")
@@ -39,7 +39,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## course_level
 
-        level_label = ttk.Label(self, text='Poziom', font=('Open Sans', 12), bootstyle='default')
+        level_label = ttk.Label(self, text='Poziom*', font=('Open Sans', 12), bootstyle='default')
         level_label.grid(row=2, column=2, sticky='w')
 
         self.level_dropdown = ttk.Menubutton(self, bootstyle='dark', text='Wybierz poziom')
@@ -58,7 +58,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## course_mode
 
-        mode_label = ttk.Label(self, text="Tryb", font=('Open Sans', 12), bootstyle='default')
+        mode_label = ttk.Label(self, text="Tryb*", font=('Open Sans', 12), bootstyle='default')
         mode_label.grid(row=2, column=3, sticky='w')
 
         self.mode_dropdown = ttk.Menubutton(self, bootstyle='dark', text="Wybierz tryb")
@@ -77,7 +77,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## start_date
 
-        start_date_label = ttk.Label(self, text='Data rozpoczęcia', font=('Open Sans', 12),
+        start_date_label = ttk.Label(self, text='Data rozpoczęcia*', font=('Open Sans', 12),
                                      bootstyle='default')
         start_date_label.grid(row=2, column=4, sticky='w')
 
@@ -96,7 +96,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## teacher_selection
 
-        teacher_selection_label = ttk.Label(self, text='Nauczyciel', font=('Open Sans', 12),
+        teacher_selection_label = ttk.Label(self, text='Nauczyciel*', font=('Open Sans', 12),
                                             bootstyle='default')
         teacher_selection_label.grid(row=5, column=2, sticky='w')
 
@@ -105,7 +105,7 @@ class CreateCourseFrame(ttk.Frame):
 
         ## prize
 
-        prize_label = ttk.Label(self, text="Cena", font=('Open Sans', 12), bootstyle='default')
+        prize_label = ttk.Label(self, text="Cena*", font=('Open Sans', 12), bootstyle='default')
         prize_label.grid(row=5, column=3, sticky='w')
 
         prize_entry = ttk.Entry(self, bootstyle='light', width=15)

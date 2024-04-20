@@ -1,5 +1,9 @@
 from tkinter import *
 import ttkbootstrap as ttk
+from ttkbootstrap.dialogs import Messagebox
+import psycopg2
+import re
+import decimal
 
 
 class AddATeacherFrame(ttk.Frame):
@@ -19,106 +23,154 @@ class AddATeacherFrame(ttk.Frame):
 
         ## first_name
 
-        first_name_label = ttk.Label(self, text="Imię", font=('Open Sans', 12), bootstyle='default')
+        first_name_label = ttk.Label(self, text="Imię*", font=('Open Sans', 12), bootstyle='default')
         first_name_label.grid(row=2, column=0, sticky='w')
 
-        first_name = ttk.Entry(self, width=30, bootstyle='light')
-        first_name.grid(row=3, column=0)
+        self.first_name_var = StringVar()
+
+        self.first_name = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.first_name_var)
+        self.first_name.grid(row=3, column=0)
+
+        self.first_name_var.trace_add('write', self.validate_first_name)
 
         ## last_name
 
-        last_name_label = ttk.Label(self, text="Nazwisko", font=('Open Sans', 12), bootstyle='default')
+        last_name_label = ttk.Label(self, text="Nazwisko*", font=('Open Sans', 12), bootstyle='default')
         last_name_label.grid(row=2, column=2, sticky='w')
 
-        last_name = ttk.Entry(self, width=30, bootstyle='light')
-        last_name.grid(row=3, column=2)
+        self.last_name_var = StringVar()
+
+        self.last_name = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.last_name_var)
+        self.last_name.grid(row=3, column=2)
+
+        self.last_name_var.trace_add('write', self.validate_last_name)
 
         ## street
 
-        street_label = ttk.Label(self, text='Ulica', font=('Open Sans', 12), bootstyle='default')
+        street_label = ttk.Label(self, text='Ulica*', font=('Open Sans', 12), bootstyle='default')
         street_label.grid(row=5, column=0, sticky='w')
 
-        street = ttk.Entry(self, width=30, bootstyle='light')
-        street.grid(row=6, column=0, sticky='e')
+        self.street_var = StringVar()
+
+        self.street = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.street_var)
+        self.street.grid(row=6, column=0, sticky='e')
+
+        self.street_var.trace_add('write', self.validate_street)
 
         ## building_no
 
-        building_no_label = ttk.Label(self, text='Nr domu', font=('Open Sans', 12), bootstyle='default')
+        building_no_label = ttk.Label(self, text='Nr domu*', font=('Open Sans', 12), bootstyle='default')
         building_no_label.grid(row=5, column=2, sticky='w')
 
-        building_no = ttk.Entry(self, width=10, bootstyle='light')
-        building_no.grid(row=6, column=2, sticky='w')
+        self.building_no_var = StringVar()
+
+        self.building_no = ttk.Entry(self, width=10, bootstyle='light', textvariable=self.building_no_var)
+        self.building_no.grid(row=6, column=2, sticky='w')
+
+        self.building_no_var.trace_add('write', self.validate_building_no)
 
         ## local_no
 
         local_no_label = ttk.Label(self, text='Nr lokalu', font=('Open Sans', 12), bootstyle='default')
         local_no_label.grid(row=5, column=3, sticky='w')
 
-        local_no = ttk.Entry(self, width=10, bootstyle='light')
-        local_no.grid(row=6, column=3, sticky='w')
+        self.local_no_var = StringVar()
+
+        self.local_no = ttk.Entry(self, width=10, bootstyle='light', textvariable=self.local_no_var)
+        self.local_no.grid(row=6, column=3, sticky='w')
+
+        self.local_no_var.trace_add('write', self.validate_local_no)
 
         ## city
 
-        city_label = ttk.Label(self, text="Miasto", font=('Open Sans', 12), bootstyle='default')
+        city_label = ttk.Label(self, text="Miasto*", font=('Open Sans', 12), bootstyle='default')
         city_label.grid(row=8, column=0, sticky='w')
 
-        city = ttk.Entry(self, width=30, bootstyle='light')
-        city.grid(row=9, column=0, sticky='w')
+        self.city_var = StringVar()
+
+        self.city = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.city_var)
+        self.city.grid(row=9, column=0, sticky='w')
+
+        self.city_var.trace_add('write', self.validate_city)
 
         ## postal_code
 
-        postal_code_label = ttk.Label(self, text="Kod pocztowy", font=('Open Sans', 12),
+        postal_code_label = ttk.Label(self, text="Kod pocztowy*", font=('Open Sans', 12),
                                       bootstyle='default')
         postal_code_label.grid(row=8, column=2, sticky='w')
 
-        postal_code = ttk.Entry(self, width=15, bootstyle='light')
-        postal_code.grid(row=9, column=2, sticky='w')
+        self.postal_code_var = StringVar()
+
+        self.postal_code = ttk.Entry(self, width=15, bootstyle='light', textvariable=self.postal_code_var)
+        self.postal_code.grid(row=9, column=2, sticky='w')
+
+        self.postal_code_var.trace_add('write', self.validate_postal_code)
 
         ## country
 
-        country_label = ttk.Label(self, text="Państwo", font=('Open Sans', 12), bootstyle='default')
+        country_label = ttk.Label(self, text="Państwo*", font=('Open Sans', 12), bootstyle='default')
         country_label.grid(row=8, column=3, sticky='w')
 
-        country = ttk.Entry(self, width=30, bootstyle='light')
-        country.grid(row=9, column=3, sticky='w')
+        self.country_var = StringVar()
+
+        self.country = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.country_var)
+        self.country.grid(row=9, column=3, sticky='w')
+
+        self.country_var.trace_add('write', self.validate_country)
 
         ## email
 
         email_label = ttk.Label(self, text="Adres e-mail", font=('Open Sans', 12), bootstyle='default')
         email_label.grid(row=11, column=0, sticky='w')
 
-        email = ttk.Entry(self, width=30, bootstyle='light')
-        email.grid(row=12, column=0, sticky='w')
+        self.email_var = StringVar()
+
+        self.email = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.email_var)
+        self.email.grid(row=12, column=0, sticky='w')
+
+        self.email_var.trace_add('write', self.validate_email)
 
         ## phone number
 
-        phone_number_label = ttk.Label(self, text="Nr telefonu", font=('Open Sans', 12),
+        phone_number_label = ttk.Label(self, text="Nr telefonu*", font=('Open Sans', 12),
                                        bootstyle='default')
         phone_number_label.grid(row=11, column=2, sticky='w')
 
-        phone_number = ttk.Entry(self, width=20, bootstyle='light')
-        phone_number.grid(row=12, column=2, sticky='w')
+        self.phone_var = StringVar()
+
+        self.phone_number = ttk.Entry(self, width=20, bootstyle='light', textvariable=self.phone_var)
+        self.phone_number.grid(row=12, column=2, sticky='w')
+
+        self.phone_var.trace_add('write', self.validate_phone)
 
         ## personal id
 
-        personal_id_label = ttk.Label(self, text="PESEL", font=('Open Sans', 12), bootstyle='default')
+        personal_id_label = ttk.Label(self, text="PESEL*", font=('Open Sans', 12), bootstyle='default')
         personal_id_label.grid(row=11, column=3, sticky='w')
 
-        personal_id = ttk.Entry(self, width=20, bootstyle='light')
-        personal_id.grid(row=12, column=3, sticky='w')
+        self.personal_id_var = StringVar()
+
+        self.personal_id = ttk.Entry(self, width=20, bootstyle='light', textvariable=self.personal_id_var)
+        self.personal_id.grid(row=12, column=3, sticky='w')
+
+        self.personal_id_var.trace_add('write', self.validate_personal_id)
 
         ## document_no
 
-        document_no_label = ttk.Label(self, text="Nr dokumentu", font=('Open Sans', 12),
+        document_no_label = ttk.Label(self, text="Nr dokumentu*", font=('Open Sans', 12),
                                       bootstyle='default')
         document_no_label.grid(row=14, column=0, sticky='w')
 
-        document_no = ttk.Entry(self, width=20, bootstyle='light')
-        document_no.grid(row=15, column=0, sticky='w')
+        self.document_no_var = StringVar()
+
+        self.document_no = ttk.Entry(self, width=20, bootstyle='light', textvariable=self.document_no_var)
+        self.document_no.grid(row=15, column=0, sticky='w')
+
+        self.document_no_var.trace_add('write', self.validate_document_no)
 
         ## document_type
 
-        document_type_label = ttk.Label(self, text="Rodzaj dokumentu", font=('Open Sans', 12),
+        document_type_label = ttk.Label(self, text="Rodzaj dokumentu*", font=('Open Sans', 12),
                                         bootstyle='default')
         document_type_label.grid(row=14, column=2, sticky='w')
 
@@ -137,7 +189,7 @@ class AddATeacherFrame(ttk.Frame):
 
         ## type_of_contract
 
-        type_of_contract_label = ttk.Label(self, text="Rodzaj umowy", font=('Open Sans', 12),
+        type_of_contract_label = ttk.Label(self, text="Rodzaj umowy*", font=('Open Sans', 12),
                                            bootstyle='default')
         type_of_contract_label.grid(row=14, column=3, sticky='w')
 
@@ -157,7 +209,7 @@ class AddATeacherFrame(ttk.Frame):
 
         ## type_of_employment
 
-        type_of_employment_label = ttk.Label(self, text='Rodzaj zatrudnienia', font=('Open Sans', 12),
+        type_of_employment_label = ttk.Label(self, text='Rodzaj zatrudnienia*', font=('Open Sans', 12),
                                              bootstyle='default')
         type_of_employment_label.grid(row=14, column=4, sticky='w')
 
@@ -177,33 +229,41 @@ class AddATeacherFrame(ttk.Frame):
 
         ## salary
 
-        salary_label = ttk.Label(self, text="Wynagrodzenie", font=('Open Sans', 12), bootstyle='default')
+        salary_label = ttk.Label(self, text="Wynagrodzenie*", font=('Open Sans', 12), bootstyle='default')
         salary_label.grid(row=17, column=0, sticky='w')
 
-        salary = ttk.Entry(self, width=20, bootstyle='light')
-        salary.grid(row=18, column=0, sticky='w')
+        self.salary_var = StringVar()
+
+        self.salary = ttk.Entry(self, width=20, bootstyle='light', textvariable=self.salary_var)
+        self.salary.grid(row=18, column=0, sticky='w')
+
+        self.salary_var.trace_add('write', self.validate_salary)
 
         ## employment_start
 
-        employment_start_label = ttk.Label(self, text='Data rozpoczęcia pracy', font=('Open Sans', 12),
+        employment_start_label = ttk.Label(self, text='Data rozpoczęcia pracy*', font=('Open Sans', 12),
                                            bootstyle='default')
         employment_start_label.grid(row=17, column=2, sticky='w')
 
-        employment_start_entry = ttk.DateEntry(self, bootstyle='primary')
-        employment_start_entry.grid(row=18, column=2, sticky='w')
+        self.employment_start_entry = ttk.DateEntry(self, bootstyle='primary')
+        self.employment_start_entry.grid(row=18, column=2, sticky='w')
 
         # native_language
 
-        native_language_label = ttk.Label(self, text='Język ojczysty', font=('Open Sans', 12),
+        native_language_label = ttk.Label(self, text='Język ojczysty*', font=('Open Sans', 12),
                                           bootstyle='default')
         native_language_label.grid(row=17, column=3, sticky='w')
 
-        native_language_entry = ttk.Entry(self, width=20, bootstyle='light')
-        native_language_entry.grid(row=18, column=3, sticky='w')
+        self.native_language_var = StringVar()
+
+        self.native_language_entry = ttk.Entry(self, width=20, bootstyle='light', textvariable=self.native_language_var)
+        self.native_language_entry.grid(row=18, column=3, sticky='w')
+
+        self.native_language_var.trace_add('write', self.validate_native_language)
 
         # language_to_teach
 
-        language_to_teach_label = ttk.Label(self, text='Język nauczania', font=('Open Sans', 12),
+        language_to_teach_label = ttk.Label(self, text='Język nauczania*', font=('Open Sans', 12),
                                             bootstyle='default')
         language_to_teach_label.grid(row=17, column=4, sticky='w')
 
@@ -224,10 +284,80 @@ class AddATeacherFrame(ttk.Frame):
         submit_button_style.configure('success.TButton', font=('Open Sans', 16))
 
         submit_button = ttk.Button(self, bootstyle='success', text='ZAPISZ', width=20,
-                                   style='success.TButton')
+                                   style='success.TButton', command=self.submit_data)
         submit_button.grid(row=21, column=3, sticky='w')
 
         self.pack()
+
+    def submit_data(self):
+
+        # Connect to the database
+        conn = psycopg2.connect(
+            database='enroll_proto',
+            host='localhost',
+            user='postgres',
+            password='kulek',
+            port='5432'
+        )
+
+        cur = conn.cursor()
+
+        local_no_value = self.local_no.get() or None
+
+        cur.execute(
+            """
+            INSERT INTO teacher_personal_info (
+                first_name, last_name, street, building_no, local_no, city, postal_code, country, email, phone, personal_id,
+                document_no, document_type, type_of_contract, type_of_employment, salary, status_of_employment, employment_start
+            )
+            VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+            )
+            RETURNING teacher_id;
+            """,
+            (
+                self.first_name.get(), self.last_name.get(), self.street.get(), self.building_no.get(),
+                local_no_value,  # Pass None if local_no is not provided
+                self.city.get(), self.postal_code.get(), self.country.get(),
+                self.email.get(), self.phone_number.get(), self.personal_id.get(), self.document_no.get(),
+                self.on_document_type_select(), self.on_contract_type_select(), self.on_employment_type_select(),
+                self.salary.get(), 'Aktywny', self.employment_start_entry.entry.get()
+            )
+        )
+
+        # Fetch the inserted teacher_id, first_name, and last_name
+        cur.execute(
+            """
+            SELECT teacher_id, first_name, last_name
+            FROM teacher_personal_info
+            ORDER BY teacher_id DESC
+            LIMIT 1;
+            """
+        )
+        teacher_info = cur.fetchone()
+
+        # Insert data into teacher_language_skills table
+        cur.execute(
+            """
+            INSERT INTO teacher_language_skills (
+                teacher_id, first_name, last_name, native_language, language_to_teach
+            )
+            VALUES (
+                %s, %s, %s, %s, %s
+            );
+            """,
+            (
+                teacher_info[0], teacher_info[1], teacher_info[2], self.native_language_entry.get(),
+                self.on_language_to_teach_select()
+            )
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    """
+    Functions for dropdown selection.
+    """
 
     def on_document_type_select(self):
         selected_document_type = self.document_var.get()
@@ -252,3 +382,213 @@ class AddATeacherFrame(ttk.Frame):
         print("Selected language:", selected_language)
         self.amend_menu_content_func(self.language_to_teach, selected_language)
         return selected_language
+
+    """
+    Validation functions
+    """
+
+    def validate_first_name(self, *args):
+        first_name = self.first_name_var.get()
+        print(len(first_name))
+
+        if len(first_name) > 64:
+            self.show_custom_messagebox("Długość imienia nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in first_name):
+            self.show_custom_messagebox("Pole 'Imię' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(first_name) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Imię' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_last_name(self, *args):
+        last_name = self.last_name_var.get()
+        print(len(last_name))
+
+        if len(last_name) > 64:
+            self.show_custom_messagebox("Długość nazwiska nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in last_name):
+            self.show_custom_messagebox("Pole 'Nazwisko' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(last_name) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Nazwisko' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_street(self, *args):
+        street = self.street_var.get()
+        print(len(street))
+
+        if len(street) > 128:
+            self.show_custom_messagebox("Długość nazwy ulicy nie może przekraczać 128 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(street) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Ulica' nie może zawierać znaków specjalnych", "Błąd")
+
+
+    def validate_building_no(self, *args):
+        building_no = self.building_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(building_no) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Nr domu' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_local_no(self, *args):
+        local_no = self.local_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(local_no) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Nr lokalu' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_city(self, *args):
+        city = self.city_var.get()
+        print(len(city))
+
+        if len(city) > 64:
+            self.show_custom_messagebox("Długość nazwy miasta nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in city):
+            self.show_custom_messagebox("Pole 'Miasto' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(city) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Miasto' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_postal_code(self, *args):
+        postal_code = self.postal_code_var.get()
+        print(len(postal_code))
+
+        if len(postal_code) > 8:
+            self.show_custom_messagebox("Długość kodu pocztowego nie może przekraczać 8 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(postal_code) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Kod pocztowy' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_country(self, *args):
+        country = self.country_var.get()
+        print(len(country))
+
+        if len(country) > 64:
+            self.show_custom_messagebox("Długość nazwy kraju nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in country):
+            self.show_custom_messagebox("Pole 'Państwo' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(country) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Państwo' nie może zawierać znaków specjalnych", "Błąd")
+
+
+    def validate_email(self, *args):
+        email = self.email_var.get()
+        print(len(email))
+
+        if len(email) > 64:
+            self.show_custom_messagebox("Długość adresu email nie może przekraczać 64 znaków", "Błąd")
+
+    def validate_phone(self, *args):
+        phone = self.phone_var.get()
+
+        for i in phone:
+            if i.isdigit() is False:
+                self.show_custom_messagebox("Pole 'Nr telefonu nie może zawierać liter", "Błąd")
+
+    def validate_personal_id(self, *args):
+        pid = self.personal_id_var.get()
+
+        for i in pid:
+            if i.isdigit() is False:
+                self.show_custom_messagebox("Pole 'PESEL' nie może zawierać liter", "Błąd")
+
+    def validate_document_no(self, *args):
+        doc_no = self.document_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(doc_no) == None):
+            print("String is accepted")
+        else:
+            self.show_custom_messagebox("Pole 'Nr dokumentu' nie może zawierać znaków specjalnych", "Błąd")
+
+        if len(doc_no) > 32:
+            self.show_custom_messagebox("Długość numeru dokumentu nie może przekraczać 32 znaków", "Błąd")
+
+    def validate_salary(self, *args):
+        salary = self.salary_var.get()
+
+        for i in salary:
+            if i == " ":
+                self.show_custom_messagebox("Pole 'Wypłata' nie może zawierać spacji", "Błąd")
+            elif i.isdigit() is False and i != '.':
+                self.show_custom_messagebox("Pole 'Wypłata' nie może zawierać liter ani znaków specjalnych", "Błąd")
+            elif salary[0] == '.':
+                self.show_custom_messagebox("Wartość pola 'Wypłata' nie może zaczynać się od kropki", "Błąd")
+            else:
+                d = decimal.Decimal(salary)
+                if d.as_tuple().exponent == -1 or d.as_tuple().exponent <= -3:
+                    self.show_custom_messagebox("Pole 'Wypłata' musi zawierać dwa miejsca po przecinku",
+                                                "Błąd")
+
+    def validate_native_language(self, *args):
+        native_language = self.native_language_var.get()
+
+        if len(native_language) > 16:
+            self.show_custom_messagebox("Wartość pola 'Język ojczysty' nie może przekraczać 16 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(native_language) == None):
+            pass
+        else:
+            self.show_custom_messagebox("Pole 'Język ojczysty' nie może zawierać znaków specjalnych", "Błąd")
+
+        if any(chr.isdigit() for chr in native_language):
+            self.show_custom_messagebox("Pole 'Język ojczysty' nie może zawierać liczb", "Błąd")
+
+    """
+    Function that allows to generate a custom messagebox and control its position. 
+    """
+    def show_custom_messagebox(self, message, title):
+        custom_mb = Toplevel(self.master)
+        custom_mb.title(title)
+
+        width = 700
+        height = 130
+
+        custom_mb.geometry(f"{width}x{height}")
+
+        x_offset = 40
+        y_offset = -70
+        self.master.update_idletasks()  # Ensures the window is fully updated before getting its size
+        x_pos = self.master.winfo_x() + (self.master.winfo_width() // 2) - (width // 2) + x_offset
+        y_pos = self.master.winfo_y() + (self.master.winfo_height() // 2) - (height // 2) + y_offset
+        custom_mb.geometry(f"+{x_pos}+{y_pos}")
+
+        Label(custom_mb, text=message, font=('Open Sans', 12), pady=20).pack()
+        Button(custom_mb, text="OK", command=custom_mb.destroy, width=20, height=1, font=('Open Sans', 12)).pack()
