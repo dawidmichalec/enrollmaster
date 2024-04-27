@@ -47,11 +47,11 @@ def edit_student_info_switch():
 
 
 """
-Function that switches to student info frame.
+Function that switches to find a student frame.
 """
 def find_a_student_switch():
     delete_pages()
-    find_a_student_frame = FindAStudentFrame(main_frame, amend_menu_content)
+    find = FindAStudentFrame(main_frame, amend_menu_content)
 
 
 """
@@ -97,8 +97,7 @@ def edit_teacher_switch():
 """
 Function that switches to teacher_info_frame.
 """
-
-def teacher_info_switch():
+def find_a_teacher_switch():
     delete_pages()
     find_a_teacher_frame = FindATeacherFrame(main_frame, amend_menu_content)
 
@@ -179,8 +178,8 @@ add_a_teacher.place(x=10, y=483)
 edit_teacher_info = ttk.Button(text='EDYTUJ NAUCZYCIELA', bootstyle='info', width=22, command=lambda: edit_teacher_switch())
 edit_teacher_info.place(x=10, y=521)
 
-teacher_info_button = ttk.Button(text='ZNAJDŹ NAUCZYCIELA', bootstyle='info', width=22, command=lambda: teacher_info_switch())
-teacher_info_button.place(x=10, y=559)
+find_a_teacher = ttk.Button(text='ZNAJDŹ NAUCZYCIELA', bootstyle='info', width=22, command=lambda: find_a_teacher_switch())
+find_a_teacher.place(x=10, y=559)
 
 payments = ttk.Button(text='PŁATNOŚCI', bootstyle='light-outline', width=22, style='light.Outline.TButton', state='disabled')
 payments.place(x=10, y=597)

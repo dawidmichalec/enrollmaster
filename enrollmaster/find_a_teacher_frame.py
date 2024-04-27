@@ -6,7 +6,6 @@ class FindATeacherFrame(ttk.Frame):
 
     def __init__(self, master=None, amend_menu_content_func=None, **kw):
         super().__init__(master, **kw)
-        print("Initialized")
         self.amend_menu_content_func = amend_menu_content_func
         self.columnconfigure((0, 2, 3, 4, 5), weight=1, minsize=250)
         self.columnconfigure(1, weight=1, minsize=50)
@@ -16,3 +15,5 @@ class FindATeacherFrame(ttk.Frame):
 
         frame_label = ttk.Label(self, text='ZNAJDŹ NAUCZYIELA', font=('Open Sans', 14, 'bold'), bootstyle='default')
         frame_label.grid(row=0, column=3, sticky='w')
+
+        self.pack()
