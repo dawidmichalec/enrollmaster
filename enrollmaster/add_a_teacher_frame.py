@@ -621,7 +621,7 @@ class AddATeacherFrame(ttk.Frame):
             self.show_custom_messagebox("Pole 'Wypłata' zawiera błędy\nPopraw formularz", "Błąd")
             return False
         elif len(self.salary_var.get()) == 0:
-            self.show_custom_messagebox("Pole 'Wypłata' nie może być puste\nPopraw formularz")
+            self.show_custom_messagebox("Pole 'Wypłata' nie może być puste\nPopraw formularz", "Błąd")
 
         return True
 
