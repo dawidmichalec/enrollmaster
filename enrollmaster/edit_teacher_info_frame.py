@@ -3,6 +3,8 @@ import ttkbootstrap as ttk
 import psycopg2
 import re
 import decimal
+from datetime import datetime
+
 
 class EditTeacherInfoFrame(ttk.Frame):
 
@@ -35,6 +37,7 @@ class EditTeacherInfoFrame(ttk.Frame):
         self.native_language_var = StringVar()
         self.language_to_teach_var = StringVar()
         self.employment_status_var = StringVar()
+        self.date_var = StringVar()
 
         ## name of the frame/page
 
@@ -362,10 +365,194 @@ class EditTeacherInfoFrame(ttk.Frame):
 
         self.pack()
 
+    def establish_database_connection(self):
+        # Connect to the PostgreSQL database
+        connection = psycopg2.connect(
+            database='enroll_proto',
+            host='localhost',
+            user='postgres',
+            password='kulek',
+            port='5432'
+        )
+        return connection
 
     def search_function(self):
-        self.edit_button['state'] = 'normal'
-        self.block_button['state'] = 'normal'
+        # Connect to the PostgreSQL database
+        connection = self.establish_database_connection()
+
+        teacher_id = self.id_entry.get()
+        first_name = self.first_name.get()
+        last_name = self.last_name.get()
+
+        try:
+            cursor = connection.cursor()
+
+            # Check if only ID is provided
+            if teacher_id and not (first_name or last_name):
+                query = """SELECT  
+                                    teacher_id, 
+                                    first_name, 
+                                    last_name, 
+                                    street, 
+                                    building_no, 
+                                    local_no,
+                                    city, 
+                                    postal_code, 
+                                    country, 
+                                    email, 
+                                    phone,
+                                    personal_id,
+                                    document_no,
+                                    document_type, 
+                                    type_of_contract, 
+                                    type_of_employment,
+                                    salary,
+                                    native_language, 
+                                    language_to_teach, 
+                                    employment_start,
+                                    status_of_employment FROM teachers  
+                                    WHERE teacher_id = %s;"""
+                cursor.execute(query, (teacher_id,))
+                # Check if both first name and last name are provided
+            elif first_name and last_name:
+                query = """SELECT
+                                    teacher_id, 
+                                    first_name, 
+                                    last_name, 
+                                    street, 
+                                    building_no, 
+                                    local_no,
+                                    city, 
+                                    postal_code, 
+                                    country, 
+                                    email, 
+                                    phone,
+                                    personal_id,
+                                    document_no,
+                                    document_type, 
+                                    type_of_contract, 
+                                    type_of_employment,
+                                    salary,
+                                    native_language, 
+                                    language_to_teach, 
+                                    employment_start,
+                                    status_of_employment FROM teachers  WHERE first_name = %s AND last_name = %s;"""
+                cursor.execute(query, (first_name, last_name))
+                # Check if only first name or only last name is provided
+            elif first_name or last_name:
+                self.show_custom_information("Należy podać ID nauczyciela lub imię oraz nazwisko", "Błąd")
+                return
+            # If all three values are provided
+            else:
+                query = """SELECT
+                            teacher_id, 
+                            first_name, 
+                            last_name, 
+                            street, 
+                            building_no, 
+                            local_no,
+                            city, 
+                            postal_code, 
+                            country, 
+                            email, 
+                            phone,
+                            personal_id,
+                            document_no,
+                            document_type, 
+                            type_of_contract, 
+                            type_of_employment,
+                            salary,
+                            native_language, 
+                            language_to_teach, 
+                            employment_start,
+                            status_of_employment FROM teachers 
+                            WHERE teacher_id = %s AND first_name = %s AND last_name = %s;"""
+                cursor.execute(query, (teacher_id, first_name, last_name))
+
+            # Fetch and return the results
+            results = cursor.fetchone()
+
+            if not results:
+                self.show_custom_information("Nie znaleziono nauczyciela. Sprawdź czy podałeś poprawne dane", "Info")
+            else:
+                # If the search is successful, unblock edit and block buttons:
+                self.edit_button['state'] = 'normal'
+                self.block_button['state'] = 'normal'
+
+                teacher_id, first_name, last_name, street, building_no, local_no, city, postal_code, country, email,\
+                    phone,personal_id, document_no, document_type, type_of_contract, type_of_employment, salary,\
+                    native_language, language_to_teach, employment_start, status_of_employment = results
+
+                self.teacher_id_var.set(teacher_id)
+                self.first_name_var.set(first_name)
+                self.last_name_var.set(last_name)
+                self.street_var.set(street)
+                self.building_no_var.set(building_no)
+                self.local_no_var.set(local_no)
+                self.city_var.set(city)
+                self.postal_code_var.set(postal_code)
+                self.country_var.set(country)
+                self.email_var.set(email)
+                self.phone_number_var.set(phone)
+                self.personal_id_var.set(personal_id)
+                self.document_no_var.set(document_no)
+                self.document_type_output.configure(text=document_type)
+                self.document_var.set(document_type)
+                self.type_of_contract.configure(text=type_of_contract)
+                self.type_of_contract_var.set(type_of_contract)
+                self.type_of_employment_output.configure(text=type_of_employment)
+                self.type_of_employment_var.set(type_of_employment)
+                self.salary_var.set(salary)
+                self.native_language_var.set(native_language)
+                self.language_to_teach.configure(text=language_to_teach)
+                self.language_to_teach_var.set(language_to_teach)
+                self.employment_status_var.set(status_of_employment)
+
+                # Extract the date portion from the timestamp string
+                date_str = str(employment_start).split()[0]
+
+                # Parse the date string into a datetime object
+                db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d-%m-%Y")
+                new_date = db_date.replace("-", ".")
+                self.start_date_output.entry.configure(textvariable=self.date_var)
+                self.date_var.set(new_date)
+
+        finally:
+            # Close the database connection
+            connection.close()
+
+    def block_function(self):
+        self.show_custom_messagebox("Czy na pewno chcesz zablokować tego nauczyciela?",
+                                    "Ostrzeżenie",
+                                    self.block_teacher,
+                                    self.dismiss_messagebox)
+
+    def block_teacher(self):
+
+        connection = self.establish_database_connection()
+
+        try:
+            cursor = connection.cursor()
+            teacher_id = self.teacher_id_var.get()
+
+            query = """
+                    UPDATE teachers
+                    SET status_of_employment = 'Nieaktywny'
+                    WHERE teacher_id = %s;"""
+            cursor.execute(query, (teacher_id,))
+            connection.commit()
+            
+            self.clear_entries()
+            self.block_entries()
+            self.cancel_button['state'] = 'disabled'
+            self.save_button['state'] = 'disabled'
+            self.edit_button['state'] = 'disabled'
+            self.block_button['state'] = 'disabled'
+            self.show_custom_information("Nauczyciel został zablokowany", "Info")
+            # Update the status to "inactive"
+            print("Teacher blocked. Status updated to inactive.")
+        finally:
+            connection.close()
 
     def edit_function(self):
 
@@ -395,10 +582,6 @@ class EditTeacherInfoFrame(ttk.Frame):
         self.language_to_teach.configure(state='')
         self.start_date_output.configure(state='normal')
 
-
-
-
-
     def cancel_button_function(self):
         self.show_custom_messagebox("Czy na pewno chcesz odrzucić zmiany?",
                                     "Ostrzeżenie",
@@ -412,25 +595,6 @@ class EditTeacherInfoFrame(ttk.Frame):
         self.save_button['state'] = 'disabled'
         self.edit_button['state'] = 'disabled'
         self.block_button['state'] = 'disabled'
-
-
-    def block_function(self):
-        self.show_custom_messagebox("Czy na pewno chcesz zablokować tego nauczyciela?",
-                                    "Ostrzeżenie",
-                                    self.block_teacher,
-                                    self.dismiss_messagebox)
-
-    def block_teacher(self):
-        self.clear_entries()
-        self.block_entries()
-        self.cancel_button['state'] = 'disabled'
-        self.save_button['state'] = 'disabled'
-        self.edit_button['state'] = 'disabled'
-        self.block_button['state'] = 'disabled'
-
-        self.show_custom_information("Nauczyciel został zablokowany", "Info")
-        # Update the status to "inactive"
-        print("Teacher blocked. Status updated to inactive.")
 
     def clear_entries(self):
 
