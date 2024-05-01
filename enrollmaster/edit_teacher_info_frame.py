@@ -314,6 +314,8 @@ class EditTeacherInfoFrame(ttk.Frame):
 
         self.start_date_output = ttk.DateEntry(self, bootstyle='primary')
         self.start_date_output.configure(state='readonly')
+        self.date_var.set("")
+        self.start_date_output.entry.configure(textvariable=self.date_var)
         self.start_date_output.grid(row=21, column=0, sticky='w')
 
         ## status_of_employment
@@ -341,7 +343,7 @@ class EditTeacherInfoFrame(ttk.Frame):
 
         ## save_button
 
-        self.save_button = ttk.Button(self, bootstyle='info', text='ZAPISZ', width=16)
+        self.save_button = ttk.Button(self, bootstyle='info', text='ZAPISZ', width=16, command=self.save_button_function)
         self.save_button.grid(row=24, column=3, sticky='w')
         self.save_button['state'] = 'disabled'
 
@@ -521,6 +523,81 @@ class EditTeacherInfoFrame(ttk.Frame):
             # Close the database connection
             connection.close()
 
+    def save_button_function(self):
+        self.show_custom_messagebox("Czy na pewno chcesz zapisać wprowadzone zmiany?",
+                                    "Ostrzeżenie",
+                                    self.save_function,
+                                    self.dismiss_messagebox)
+
+    def save_function(self):
+        connection = self.establish_database_connection()
+        validation = self.validation_on_submission()
+
+        try:
+            if validation is True:
+                cursor = connection.cursor()
+                teacher_id = self.teacher_id_var.get()
+                first_name = self.first_name_var.get()
+                last_name = self.last_name_var.get()
+                street = self.street_var.get()
+                building_no = self.building_no_var.get()
+                local_no = self.local_no_var.get()
+                city = self.city_var.get()
+                postal_code = self.postal_code_var.get()
+                country = self.country_var.get()
+                email = self.email_var.get()
+                phone = self.phone_number_var.get()
+                personal_id = self.personal_id_var.get()
+                document_no = self.document_no_var.get()
+                document_type = self.on_document_type_select()
+                type_of_contract = self.on_contract_type_select()
+                type_of_employment = self.on_employment_type_select()
+                salary = self.salary_var.get()
+                native_language = self.native_language_var.get()
+                language_to_teach = self.on_language_to_teach_select()
+                employment_start = self.start_date_output.entry.get()
+
+                query = """
+                        UPDATE teachers
+                        SET 
+                            first_name = %s,
+                            last_name = %s,
+                            street = %s,
+                            building_no = %s,
+                            local_no = %s,
+                            city = %s,
+                            postal_code = %s,
+                            country = %s,
+                            email = %s,
+                            phone = %s,
+                            personal_id = %s,
+                            document_no = %s,
+                            document_type = %s,
+                            type_of_contract = %s,
+                            type_of_employment = %s,
+                            salary = %s,
+                            native_language = %s,
+                            language_to_teach = %s,
+                            employment_start = %s
+                        WHERE teacher_id = %s;
+                        """
+
+                cursor.execute(query, (first_name, last_name, street, building_no, local_no, city,
+                                       postal_code, country, email, phone, personal_id, document_no, document_type,
+                                       type_of_contract, type_of_employment, salary, native_language, language_to_teach,
+                                       employment_start, teacher_id))
+                connection.commit()
+                self.clear_entries()
+                self.block_entries()
+                self.cancel_button['state'] = 'disabled'
+                self.save_button['state'] = 'disabled'
+                self.edit_button['state'] = 'disabled'
+                self.block_button['state'] = 'disabled'
+                self.show_custom_information("Dane nauczyciela zostały zaktualizowane", "Info")
+
+        finally:
+            connection.close()
+
     def block_function(self):
         self.show_custom_messagebox("Czy na pewno chcesz zablokować tego nauczyciela?",
                                     "Ostrzeżenie",
@@ -541,7 +618,7 @@ class EditTeacherInfoFrame(ttk.Frame):
                     WHERE teacher_id = %s;"""
             cursor.execute(query, (teacher_id,))
             connection.commit()
-            
+
             self.clear_entries()
             self.block_entries()
             self.cancel_button['state'] = 'disabled'
@@ -549,8 +626,6 @@ class EditTeacherInfoFrame(ttk.Frame):
             self.edit_button['state'] = 'disabled'
             self.block_button['state'] = 'disabled'
             self.show_custom_information("Nauczyciel został zablokowany", "Info")
-            # Update the status to "inactive"
-            print("Teacher blocked. Status updated to inactive.")
         finally:
             connection.close()
 
@@ -581,6 +656,21 @@ class EditTeacherInfoFrame(ttk.Frame):
         self.native_language_output.configure(state='')
         self.language_to_teach.configure(state='')
         self.start_date_output.configure(state='normal')
+
+        self.first_name_var.trace_add('write', self.validate_first_name)
+        self.last_name_var.trace_add('write', self.validate_last_name)
+        self.street_var.trace_add('write', self.validate_street)
+        self.building_no_var.trace_add('write', self.validate_building_no)
+        self.local_no_var.trace_add('write', self.validate_local_no)
+        self.city_var.trace_add('write', self.validate_city)
+        self.postal_code_var.trace_add('write', self.validate_postal_code)
+        self.country_var.trace_add('write', self.validate_country)
+        self.email_var.trace_add('write', self.validate_email)
+        self.phone_number_var.trace_add('write', self.validate_phone)
+        self.personal_id_var.trace_add('write', self.validate_personal_id)
+        self.document_no_var.trace_add('write', self.validate_document_no)
+        self.salary_var.trace_add('write', self.validate_salary)
+        self.native_language_var.trace_add('write', self.validate_native_language)
 
     def cancel_button_function(self):
         self.show_custom_messagebox("Czy na pewno chcesz odrzucić zmiany?",
@@ -730,3 +820,264 @@ class EditTeacherInfoFrame(ttk.Frame):
         action()
         # Close the messagebox
         custom_mb.destroy()
+
+    """
+    Validation functions
+    """
+
+    def validate_first_name(self, *args):
+        first_name = self.first_name_var.get()
+        print(len(first_name))
+
+        if len(first_name) > 64:
+            self.show_custom_information("Długość imienia nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in first_name):
+            self.show_custom_information("Pole 'Imię' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(first_name) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Imię' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_last_name(self, *args):
+        last_name = self.last_name_var.get()
+        print(len(last_name))
+
+        if len(last_name) > 64:
+            self.show_custom_information("Długość nazwiska nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in last_name):
+            self.show_custom_information("Pole 'Nazwisko' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(last_name) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Nazwisko' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_street(self, *args):
+        street = self.street_var.get()
+        print(len(street))
+
+        if len(street) > 128:
+            self.show_custom_information("Długość nazwy ulicy nie może przekraczać 128 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(street) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Ulica' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_building_no(self, *args):
+        building_no = self.building_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(building_no) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Nr domu' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_local_no(self, *args):
+        local_no = self.local_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(local_no) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Nr lokalu' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_city(self, *args):
+        city = self.city_var.get()
+        print(len(city))
+
+        if len(city) > 64:
+            self.show_custom_information("Długość nazwy miasta nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in city):
+            self.show_custom_information("Pole 'Miasto' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(city) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Miasto' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_postal_code(self, *args):
+        postal_code = self.postal_code_var.get()
+        print(len(postal_code))
+
+        if len(postal_code) > 8:
+            self.show_custom_information("Długość kodu pocztowego nie może przekraczać 8 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(postal_code) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Kod pocztowy' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_country(self, *args):
+        country = self.country_var.get()
+        print(len(country))
+
+        if len(country) > 64:
+            self.show_custom_information("Długość nazwy kraju nie może przekraczać 64 znaków", "Błąd")
+
+        if any(chr.isdigit() for chr in country):
+            self.show_custom_information("Pole 'Państwo' nie może zawierać liczb", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(country) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Państwo' nie może zawierać znaków specjalnych", "Błąd")
+
+    def validate_email(self, *args):
+        email = self.email_var.get()
+        print(len(email))
+
+        if len(email) > 64:
+            self.show_custom_information("Długość adresu email nie może przekraczać 64 znaków", "Błąd")
+
+    def validate_phone(self, *args):
+        phone = self.phone_var.get()
+
+        for i in phone:
+            if i.isdigit() is False:
+                self.show_custom_information("Pole 'Nr telefonu nie może zawierać liter ani znaków specjalnych", "Błąd")
+                return False
+            else:
+                return True
+
+    def validate_personal_id(self, *args):
+        pid = self.personal_id_var.get()
+
+        for i in pid:
+            if i.isdigit() is False:
+                self.show_custom_information("Pole 'PESEL' nie może zawierać liter", "Błąd")
+                return False
+            else:
+                return True
+
+    def validate_document_no(self, *args):
+        doc_no = self.document_no_var.get()
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(doc_no) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Nr dokumentu' nie może zawierać znaków specjalnych", "Błąd")
+
+        if len(doc_no) > 32:
+            self.show_custom_information("Długość numeru dokumentu nie może przekraczać 32 znaków", "Błąd")
+
+    def validate_salary(self, *args):
+        salary = self.salary_var.get()
+
+        for i in salary:
+            if i == " ":
+                self.show_custom_information("Pole 'Wypłata' nie może zawierać spacji", "Błąd")
+                return False
+            elif i.isdigit() is False and i != '.':
+                self.show_custom_information("Pole 'Wypłata' nie może zawierać liter ani znaków specjalnych", "Błąd")
+                return False
+            elif salary[0] == '.':
+                self.show_custom_information("Wartość pola 'Wypłata' nie może zaczynać się od kropki", "Błąd")
+                return False
+            else:
+                d = decimal.Decimal(salary)
+                if d.as_tuple().exponent == -1 or d.as_tuple().exponent <= -3:
+                    self.show_custom_information("Pole 'Wypłata' musi zawierać dwa miejsca po przecinku",
+                                                "Błąd")
+                    return False
+
+            return True
+
+    def validate_native_language(self, *args):
+        native_language = self.native_language_var.get()
+
+        if len(native_language) > 16:
+            self.show_custom_messagebox("Wartość pola 'Język ojczysty' nie może przekraczać 16 znaków", "Błąd")
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+
+        if (regex.search(native_language) == None):
+            pass
+        else:
+            self.show_custom_information("Pole 'Język ojczysty' nie może zawierać znaków specjalnych", "Błąd")
+
+        if any(chr.isdigit() for chr in native_language):
+            self.show_custom_information("Pole 'Język ojczysty' nie może zawierać liczb", "Błąd")
+
+    def validate_input(self, input_value, max_length, error_message, allow_empty=False, regex=None):
+        if not allow_empty and not input_value.strip():
+            self.show_custom_information(f"Pole '{error_message}' nie może być puste\nPopraw formularz", "Błąd")
+            return False
+        if len(input_value) > max_length:
+            self.show_custom_information(error_message, "Błąd")
+            return False
+        if regex and regex.search(input_value):
+            self.show_custom_information(error_message, "Błąd")
+            return False
+        return True
+
+    def validation_on_submission(self):
+
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+        if not self.validate_input(self.first_name_var.get(), 64, "Imię", allow_empty=False):
+            return False
+        if not self.validate_input(self.last_name_var.get(), 64, "Nazwisko", allow_empty=False):
+            return False
+        if not self.validate_input(self.street_var.get(), 128, "Ulica", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.building_no_var.get(), float('inf'), "Nr domu", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.local_no_var.get(), float('inf'), "Nr lokalu", allow_empty=True, regex=regex):
+            return False
+        if not self.validate_input(self.city_var.get(), 64, "Miasto", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.postal_code_var.get(), 8, "Kod pocztowy", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_input(self.country_var.get(), 64, "Państwo", allow_empty=False):
+            return False
+        if not self.validate_input(self.email_var.get(), 64, "Adres email", allow_empty=False):
+            return False
+        elif re.match(pattern, self.email_var.get()) is None:
+            self.show_custom_information("Format adresu email jest niepoprawny\nPopraw formularz", "Błąd")
+            return False
+        if not self.validate_phone():
+            self.show_custom_information(
+                "Pole 'Nr telefonu' nie może zawierać liter ani znaków specjalnych\nPopraw formularz", "Błąd")
+            return False
+        elif len(self.phone_number_var.get()) == 0:
+            self.show_custom_information("Pole 'Nr telefonu' nie może być puste\nPopraw formularz")
+        if not self.validate_input(self.native_language_var.get(), 16, "Język ojczysty", allow_empty=False,
+                                   regex=regex):
+            return False
+        if not self.validate_personal_id():
+            self.show_custom_information("Pole 'PESEL' nie może zawierać liter\nPopraw formularz", "Błąd")
+            return False
+        elif len(self.personal_id_var.get()) == 0:
+            self.show_custom_information("Pole PESEL nie może być puste\nPopraw formularz")
+            return False
+        if not self.validate_input(self.document_no_var.get(), 32, "Nr dokumentu", allow_empty=False, regex=regex):
+            return False
+        if not self.validate_salary() or self.salary_var == '':
+            self.show_custom_information("Pole 'Wypłata' zawiera błędy\nPopraw formularz", "Błąd")
+            return False
+        elif len(self.salary_var.get()) == 0:
+            self.show_custom_information("Pole 'Wypłata' nie może być puste\nPopraw formularz", "Błąd")
+
+        return True
