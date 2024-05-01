@@ -109,7 +109,10 @@ class CourseInfoFrame(ttk.Frame):
         teacher_last_name = ttk.Entry(self, bootstyle='light', width=20)
         teacher_last_name.grid(row=6, column=1, sticky='w')
 
-        ## start_date
+        # start_date
+
+        start_date_var = StringVar()
+        start_date_var.set("")
 
         start_date_label = ttk.Label(self, text='Data rozpoczęcia od', font=('Open Sans', 12),
                                      bootstyle='default')
@@ -117,8 +120,12 @@ class CourseInfoFrame(ttk.Frame):
 
         start_date_entry = ttk.DateEntry(self, bootstyle='primary')
         start_date_entry.grid(row=6, column=2, sticky='w')
+        start_date_entry.entry.configure(textvariable=start_date_var)
 
-        ## end date
+        # end date
+
+        end_date_var = StringVar()
+        end_date_var.set("")
 
         end_date_label = ttk.Label(self, text='Data rozpoczęcia do', font=('Open Sans', 12),
                                    bootstyle='default')
@@ -126,13 +133,14 @@ class CourseInfoFrame(ttk.Frame):
 
         end_date_entry = ttk.DateEntry(self, bootstyle='primary')
         end_date_entry.grid(row=6, column=3, sticky='w')
+        end_date_entry.entry.configure(textvariable=end_date_var)
 
-        ## submit
+        # submit
 
         submit_button_style = ttk.Style()
         submit_button_style.configure('success.TButton', font=('Open Sans', 16))
 
-        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=20,
+        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=15,
                                    style='success.TButton')
         submit_button.grid(row=9, column=2, sticky='w')
 
