@@ -1,5 +1,7 @@
 from tkinter import *
 import ttkbootstrap as ttk
+import psycopg2
+from datetime import datetime
 
 
 class FindATeacherFrame(ttk.Frame):
@@ -26,8 +28,8 @@ class FindATeacherFrame(ttk.Frame):
         last_name_label = ttk.Label(self, text="Nazwisko", font=("Open Sans", 12), bootstyle='default')
         last_name_label.grid(column=1, row=2, sticky='w')
 
-        last_name = ttk.Entry(self, width=20, bootstyle='light')
-        last_name.grid(column=1, row=3, sticky='w')
+        self.last_name = ttk.Entry(self, width=20, bootstyle='light')
+        self.last_name.grid(column=1, row=3, sticky='w')
 
         # language_to_teach
 
@@ -63,7 +65,7 @@ class FindATeacherFrame(ttk.Frame):
         self.type_var = StringVar()
         self.type_var.set("")
 
-        for contract in ['Umowa o pracę', 'Umowa zlecenie']:
+        for contract in ['Umowa O Pracę', 'Umowa Zlecenie']:
             type_of_contract_content.add_radiobutton(label=contract, variable=self.type_var, value=contract,
                                                      command=self.on_contract_type_select)
 
@@ -111,38 +113,167 @@ class FindATeacherFrame(ttk.Frame):
 
         # employment_start_from
 
-        employment_start_from_var = StringVar()
-        employment_start_from_var.set("")
+        self.employment_start_from_var = StringVar()
+        self.employment_start_from_var.set("")
 
         employment_start_from_label = ttk.Label(self, text='Data zatrudnienia od', font=('Open Sans', 12),
-                                     bootstyle='default')
+                                                bootstyle='default')
         employment_start_from_label.grid(row=5, column=1, sticky='w')
 
-        employment_start_from = ttk.DateEntry(self, bootstyle='primary')
-        employment_start_from.grid(row=6, column=1, sticky='w')
-        employment_start_from.entry.configure(textvariable=employment_start_from_var)
+        self.employment_start_from = ttk.DateEntry(self, bootstyle='primary')
+        self.employment_start_from.grid(row=6, column=1, sticky='w')
+        self.employment_start_from.entry.configure(textvariable=self.employment_start_from_var)
 
         # employment_start_to
 
-        employment_start_to_var = StringVar()
-        employment_start_to_var.set("")
+        self.employment_start_to_var = StringVar()
+        self.employment_start_to_var.set("")
 
         employment_start_to_label = ttk.Label(self, text='Data zatrudnienia do', font=('Open Sans', 12),
-                                   bootstyle='default')
+                                              bootstyle='default')
         employment_start_to_label.grid(row=5, column=2, sticky='w')
 
-        employment_start_to = ttk.DateEntry(self, bootstyle='primary')
-        employment_start_to.grid(row=6, column=2, sticky='w')
-        employment_start_to.entry.configure(textvariable=employment_start_to_var)
+        self.employment_start_to = ttk.DateEntry(self, bootstyle='primary')
+        self.employment_start_to.grid(row=6, column=2, sticky='w')
+        self.employment_start_to.entry.configure(textvariable=self.employment_start_to_var)
 
         # submit
 
         submit_button_style = ttk.Style()
-        submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+        submit_button_style.configure('success.TButton', font=('Open Sans', 14))
 
-        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=15,
-                                   style='success.TButton')
+        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=16,
+                                   style='success.TButton', command=self.search_function)
         submit_button.grid(row=9, column=2, sticky='w')
+
+        # Create a Treeview widget
+
+        self.treeview = ttk.Treeview(self, columns=("teacher_id", "first_name", "last_name", "language_to_teach",
+                                                    "status_of_employment", "employment_start"), show="headings")
+        self.treeview.grid(row=12, column=0, columnspan=5, rowspan=10)
+
+        # Define column headings
+        self.treeview.heading("teacher_id", text="ID")
+        self.treeview.heading("first_name", text="Imię")
+        self.treeview.heading("last_name", text="Nazwisko")
+        self.treeview.heading("language_to_teach", text="Język nauczania")
+        self.treeview.heading("status_of_employment", text="Status zatrudnienia")
+        self.treeview.heading("employment_start", text="Data zatrudnienia")
+
+        # Set column widths
+        self.treeview.column("teacher_id", width=50, anchor='center')
+        self.treeview.column("first_name", width=200, anchor='center')
+        self.treeview.column("last_name", width=250, anchor='center')
+        self.treeview.column("language_to_teach", width=250, anchor='center')
+        self.treeview.column("status_of_employment", width=200, anchor='center')
+        self.treeview.column("employment_start", width=300, anchor='center')
+
+        # Add a vertical scrollbar
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        scrollbar.grid(row=13, column=5, sticky="ns")
+        self.treeview.configure(yscrollcommand=scrollbar.set)
+
+        # Add horizontal scrollbar
+        hscrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.treeview.xview)
+        hscrollbar.grid(row=21, column=0, columnspan=5, sticky="ew")
+        self.treeview.configure(xscrollcommand=hscrollbar.set)
+
+    def search_function(self):
+
+        connection = psycopg2.connect(
+            database='enroll_proto',
+            host='localhost',
+            user='postgres',
+            password='kulek',
+            port='5432'
+        )
+
+        try:
+            cursor = connection.cursor()
+            first_name = self.first_name.get()
+            last_name = self.last_name.get()
+            language_to_teach = self.lang_var.get()
+            type_of_contract = self.type_var.get()
+            type_of_employment = self.employment_var.get()
+            status = self.status_var.get()
+            employment_start_from = self.employment_start_from.entry.get()
+            employment_start_to = self.employment_start_to.entry.get()
+
+            conditions = []
+            parameters = []
+
+            if not first_name and not last_name and not language_to_teach and not type_of_contract \
+                and not type_of_employment and not status and not employment_start_from and not employment_start_to:
+                self.show_custom_information("Nie znaleziono pasujących wyników. "
+                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
+                                             "Info")
+                return
+
+            if first_name:
+                conditions.append("first_name = %s")
+                parameters.append(first_name)
+            if last_name:
+                conditions.append("last_name = %s")
+                parameters.append(last_name)
+            if language_to_teach:
+                conditions.append("language_to_teach = %s")
+                parameters.append(language_to_teach)
+            if type_of_contract:
+                conditions.append("type_of_contract = %s")
+                parameters.append(type_of_contract)
+            if type_of_employment:
+                conditions.append("type_of_employment = %s")
+                parameters.append(type_of_employment)
+            if status:
+                conditions.append("status_of_employment = %s")
+                parameters.append(status)
+            if employment_start_from:
+                conditions.append("employment_start > %s")
+                parameters.append(employment_start_from)
+            if employment_start_to:
+                conditions.append("employment_start < %s")
+                parameters.append(employment_start_to)
+
+            if employment_start_from and employment_start_to:
+                conditions.append("employment_start > %s AND employment_start < %s")
+                parameters.extend([employment_start_from, employment_start_to])
+
+            where_clause = " AND ".join(conditions)
+
+            query = """
+                    SELECT
+                        teacher_id,
+                        first_name,
+                        last_name,
+                        language_to_teach,
+                        status_of_employment,
+                        employment_start
+                    FROM teachers
+                    WHERE {}
+                    """.format(where_clause)
+            cursor.execute(query, tuple(parameters))
+            results = cursor.fetchall()
+
+            if not results:
+                self.show_custom_information("Nie znaleziono pasujących wyników. "
+                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
+                                             "Info")
+            else:
+                print("Results found")
+                self.treeview.delete(*self.treeview.get_children())
+
+                for row in results:
+                    date_str = str(row[5]).split()[0]
+                    # Parse the date string into a datetime object
+                    db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d-%m-%Y")
+                    new_date = db_date.replace("-", ".")
+
+                    self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]),
+                                                          (row[4]), new_date))
+
+                print("Number of children in Treeview:", len(self.treeview.get_children()))
+        finally:
+            connection.close()
 
     """
     Functions for dropdowns
@@ -171,3 +302,22 @@ class FindATeacherFrame(ttk.Frame):
         print("Selected type of employment:", selected_employment_type)
         self.amend_menu_content_func(self.type_of_employment, selected_employment_type)
         return selected_employment_type
+
+    def show_custom_information(self, message, title):
+        custom_mb = Toplevel(self.master)
+        custom_mb.title(title)
+
+        width = 750
+        height = 130
+
+        custom_mb.geometry(f"{width}x{height}")
+
+        x_offset = 40
+        y_offset = -70
+        self.master.update_idletasks()  # Ensures the window is fully updated before getting its size
+        x_pos = self.master.winfo_x() + (self.master.winfo_width() // 2) - (width // 2) + x_offset
+        y_pos = self.master.winfo_y() + (self.master.winfo_height() // 2) - (height // 2) + y_offset
+        custom_mb.geometry(f"+{x_pos}+{y_pos}")
+
+        Label(custom_mb, text=message, font=('Open Sans', 12), pady=20).pack()
+        Button(custom_mb, text="OK", command=custom_mb.destroy, width=20, height=1, font=('Open Sans', 12)).pack()

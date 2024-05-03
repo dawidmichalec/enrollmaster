@@ -72,9 +72,9 @@ class EditTeacherInfoFrame(ttk.Frame):
         ## submit button
 
         submit_button_style = ttk.Style()
-        submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+        submit_button_style.configure('success.TButton', font=('Open Sans', 14))
 
-        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=13,
+        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=15,
                                    style='success.TButton', command=self.search_function)
         submit_button.grid(row=5, column=3, sticky='w')
 
@@ -334,9 +334,9 @@ class EditTeacherInfoFrame(ttk.Frame):
         """
 
         edit_button_style = ttk.Style()
-        edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
+        edit_button_style.configure('primary.TButton', font=('Open Sans', 14))
 
-        self.edit_button = ttk.Button(self, bootstyle='primary', text='EDYTUJ', width=15,
+        self.edit_button = ttk.Button(self, bootstyle='primary', text='EDYTUJ', width=16,
                                  style='primary.TButton', command=self.edit_function)
         self.edit_button.grid(row=24, column=2, sticky='w')
         self.edit_button['state'] = 'disabled'
@@ -350,18 +350,18 @@ class EditTeacherInfoFrame(ttk.Frame):
         ## block_button
 
         block_button_style = ttk.Style()
-        block_button_style.configure('warning.TButton', font=('Open Sans', 15))
+        block_button_style.configure('warning.TButton', font=('Open Sans', 14))
 
-        self.block_button = ttk.Button(self, bootstyle='warning', text='ZABLOKUJ', width=15, command=self.block_function)
+        self.block_button = ttk.Button(self, bootstyle='warning', text='ZABLOKUJ', width=16, command=self.block_function)
         self.block_button.grid(row=24, column=4, sticky='w')
         self.block_button['state'] = 'disabled'
 
         ## cancel_button - sets entries back to the readonly state and buttons do disabled state, including itself
 
         cancel_button_style = ttk.Style()
-        cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
+        cancel_button_style.configure('danger.TButton', font=('Open Sans', 14))
 
-        self.cancel_button = ttk.Button(self, bootstyle='danger', text='ODRZUĆ', width=15, command=self.cancel_button_function)
+        self.cancel_button = ttk.Button(self, bootstyle='danger', text='ODRZUĆ', width=16, command=self.cancel_button_function)
         self.cancel_button.grid(row=26, column=3, sticky='w')
         self.cancel_button['state'] = 'disabled'
 
@@ -388,6 +388,9 @@ class EditTeacherInfoFrame(ttk.Frame):
 
         try:
             cursor = connection.cursor()
+            if not teacher_id and not first_name and not last_name:
+                self.show_custom_information("Należy podać ID nauczyciela lub imię oraz nazwisko", "Błąd")
+                return
 
             # Check if only ID is provided
             if teacher_id and not (first_name or last_name):
