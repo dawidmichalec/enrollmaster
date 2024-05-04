@@ -259,7 +259,6 @@ class FindATeacherFrame(ttk.Frame):
                                              "Spróbuj zmodyfikować kryteria wyszukiwania",
                                              "Info")
             else:
-                print("Results found")
                 self.treeview.delete(*self.treeview.get_children())
 
                 for row in results:
@@ -270,8 +269,6 @@ class FindATeacherFrame(ttk.Frame):
 
                     self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]),
                                                           (row[4]), new_date))
-
-                print("Number of children in Treeview:", len(self.treeview.get_children()))
         finally:
             connection.close()
 
