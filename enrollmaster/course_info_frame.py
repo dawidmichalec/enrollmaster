@@ -138,7 +138,7 @@ class CourseInfoFrame(ttk.Frame):
         # submit
 
         submit_button_style = ttk.Style()
-        submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+        submit_button_style.configure('success.TButton', font=('Open Sans', 14))
 
         submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=15,
                                    style='success.TButton')

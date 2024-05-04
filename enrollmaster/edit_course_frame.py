@@ -50,7 +50,7 @@ class EditCourseFrame(ttk.Frame):
         course_name_search_entry.grid(row=3, column=2, sticky='w')
 
         submit_button_style = ttk.Style()
-        submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+        submit_button_style.configure('success.TButton', font=('Open Sans', 14))
 
         submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=15,
                                    style='success.TButton')
@@ -184,7 +184,7 @@ class EditCourseFrame(ttk.Frame):
         """
 
         edit_button_style = ttk.Style()
-        edit_button_style.configure('primary.TButton', font=('Open Sans', 15))
+        edit_button_style.configure('primary.TButton', font=('Open Sans', 14))
 
         edit_button = ttk.Button(self, bootstyle='primary', text='EDYTUJ', width=15,
                                  style='primary.TButton',
@@ -200,7 +200,7 @@ class EditCourseFrame(ttk.Frame):
         ## cancel_button - sets entries back to the readonly state and buttons do disabled state, including itself
 
         cancel_button_style = ttk.Style()
-        cancel_button_style.configure('danger.TButton', font=('Open Sans', 15))
+        cancel_button_style.configure('danger.TButton', font=('Open Sans', 14))
 
         cancel_button = ttk.Button(self, bootstyle='danger', text='ODRZUĆ', width=15,
                                    state=f'{disabled_state_button}')
