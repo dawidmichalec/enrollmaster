@@ -3,6 +3,7 @@ import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime
 import csv
+import os
 
 
 class GenerateReportFrame(ttk.Frame):
@@ -116,12 +117,12 @@ class GenerateReportFrame(ttk.Frame):
         # export_button
 
         export_button_style = ttk.Style()
-        export_button_style.configure('primary.TButton', font=('Open Sans', 15))
+        export_button_style.configure('primary.TButton', font=('Open Sans', 14))
 
         self.results = []
 
-        self.export_button = ttk.Button(self, bootstyle='primary', text='CSV', width=13,
-                                   style='primary.TButton', command=self.export_to_csv(self.results))
+        self.export_button = ttk.Button(self, bootstyle='primary', text='CSV', width=16,
+                                   style='primary.TButton', command=lambda: self.export_to_csv(self.results))
         self.export_button.grid(row=6, column=3, sticky='w')
 
         # Create a Treeview widget
@@ -175,7 +176,14 @@ class GenerateReportFrame(ttk.Frame):
         self.treeview.configure(xscrollcommand=hscrollbar.set)
 
     def export_to_csv(self, results):
-        filename = "results.csv"
+        # Specify the directory path where you want to save the file
+        directory = os.path.join(os.path.expanduser("~"), "Desktop")
+
+        # Ensure the directory exists, create it if it doesn't
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        filename = os.path.join(directory, "results.csv")
         fieldnames = [
             "Payment ID", "Student ID", "First Name", "Last Name", "Course ID",
             "Course Name", "Language", "Level", "Mode", "Amount", "Payment Type",
@@ -201,7 +209,7 @@ class GenerateReportFrame(ttk.Frame):
                     "Payment Type": row[10], "Status": row[11], "Date Due": date_due_db,
                     "Created": created_db
                 })
-
+        self.show_custom_information("Raport w formacie CSV został wygenerowany", "Info")
         return filename
 
     def search_function(self):
@@ -300,7 +308,6 @@ class GenerateReportFrame(ttk.Frame):
 
             cursor.execute(query, parameters)
             self.results = cursor.fetchall()
-            self.export_to_csv(results=self.results)
 
             if not self.results:
                 self.show_custom_information("Nie znaleziono pasujących wyników. "
