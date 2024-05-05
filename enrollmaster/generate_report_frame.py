@@ -2,6 +2,7 @@ from tkinter import *
 import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime
+import csv
 
 
 class GenerateReportFrame(ttk.Frame):
@@ -117,9 +118,11 @@ class GenerateReportFrame(ttk.Frame):
         export_button_style = ttk.Style()
         export_button_style.configure('primary.TButton', font=('Open Sans', 15))
 
-        export_button = ttk.Button(self, bootstyle='primary', text='CSV', width=13,
-                                   style='primary.TButton')
-        export_button.grid(row=6, column=3, sticky='w')
+        self.results = []
+
+        self.export_button = ttk.Button(self, bootstyle='primary', text='CSV', width=13,
+                                   style='primary.TButton', command=self.export_to_csv(self.results))
+        self.export_button.grid(row=6, column=3, sticky='w')
 
         # Create a Treeview widget
 
@@ -170,6 +173,36 @@ class GenerateReportFrame(ttk.Frame):
         hscrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.treeview.xview)
         hscrollbar.grid(row=21, column=0, columnspan=5, sticky="ew")
         self.treeview.configure(xscrollcommand=hscrollbar.set)
+
+    def export_to_csv(self, results):
+        filename = "results.csv"
+        fieldnames = [
+            "Payment ID", "Student ID", "First Name", "Last Name", "Course ID",
+            "Course Name", "Language", "Level", "Mode", "Amount", "Payment Type",
+            "Status", "Date Due", "Created"
+        ]
+
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()  # Write header
+
+            for row in results:
+                date_due_str = str(row[12]).split()[0]
+                date_due_db = datetime.strptime(date_due_str, "%Y-%m-%d").strftime("%d.%m.%Y")
+
+                created_str = str(row[13]).split()[0]
+                created_db = datetime.strptime(created_str, "%Y-%m-%d").strftime("%d.%m.%Y")
+
+                writer.writerow({
+                    "Payment ID": row[0], "Student ID": row[1], "First Name": row[2],
+                    "Last Name": row[3], "Course ID": row[4], "Course Name": row[5],
+                    "Language": row[6], "Level": row[7], "Mode": row[8], "Amount": row[9],
+                    "Payment Type": row[10], "Status": row[11], "Date Due": date_due_db,
+                    "Created": created_db
+                })
+
+        return filename
 
     def search_function(self):
 
@@ -266,16 +299,17 @@ class GenerateReportFrame(ttk.Frame):
                     """.format(where_clause)
 
             cursor.execute(query, parameters)
-            results = cursor.fetchall()
+            self.results = cursor.fetchall()
+            self.export_to_csv(results=self.results)
 
-            if not results:
+            if not self.results:
                 self.show_custom_information("Nie znaleziono pasujących wyników. "
                                              "Spróbuj zmodyfikować kryteria wyszukiwania",
                                              "Info")
             else:
                 self.treeview.delete(*self.treeview.get_children())
 
-                for row in results:
+                for row in self.results:
                     date_due_str = str(row[12]).split()[0]
                     date_due_db = datetime.strptime(date_due_str, "%Y-%m-%d").strftime("%d.%m.%Y")
 
