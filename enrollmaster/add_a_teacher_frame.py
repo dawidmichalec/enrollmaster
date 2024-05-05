@@ -11,7 +11,7 @@ class AddATeacherFrame(ttk.Frame):
     def __init__(self, master=None, amend_menu_content_func=None, **kw):
         super().__init__(master, **kw)
         self.amend_menu_content_func = amend_menu_content_func
-        self.columnconfigure((0, 2, 3, 4, 5), weight=1, minsize=250)
+        self.columnconfigure((0, 2, 3, 4, 5), weight=1, minsize=300)
         self.columnconfigure(1, weight=1, minsize=50)
         self.rowconfigure(
             (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
@@ -29,7 +29,7 @@ class AddATeacherFrame(ttk.Frame):
         self.first_name_var = StringVar()
 
         self.first_name = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.first_name_var)
-        self.first_name.grid(row=3, column=0)
+        self.first_name.grid(row=3, column=0, sticky ='w')
 
         self.first_name_var.trace_add('write', self.validate_first_name)
 
@@ -41,7 +41,7 @@ class AddATeacherFrame(ttk.Frame):
         self.last_name_var = StringVar()
 
         self.last_name = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.last_name_var)
-        self.last_name.grid(row=3, column=2)
+        self.last_name.grid(row=3, column=2, sticky='w')
 
         self.last_name_var.trace_add('write', self.validate_last_name)
 
@@ -53,7 +53,7 @@ class AddATeacherFrame(ttk.Frame):
         self.street_var = StringVar()
 
         self.street = ttk.Entry(self, width=30, bootstyle='light', textvariable=self.street_var)
-        self.street.grid(row=6, column=0, sticky='e')
+        self.street.grid(row=6, column=0, sticky='w')
 
         self.street_var.trace_add('write', self.validate_street)
 

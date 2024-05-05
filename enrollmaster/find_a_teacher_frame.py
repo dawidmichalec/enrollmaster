@@ -9,7 +9,7 @@ class FindATeacherFrame(ttk.Frame):
     def __init__(self, master=None, amend_menu_content_func=None, **kw):
         super().__init__(master, **kw)
         self.amend_menu_content_func = amend_menu_content_func
-        self.columnconfigure((0, 1, 2, 3, 4), weight=1, minsize=250)
+        self.columnconfigure((0, 1, 2, 3, 4), weight=1, minsize=50)
         self.rowconfigure(
             (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
             weight=1, minsize=30)
@@ -149,7 +149,8 @@ class FindATeacherFrame(ttk.Frame):
         # Create a Treeview widget
 
         self.treeview = ttk.Treeview(self, columns=("teacher_id", "first_name", "last_name", "language_to_teach",
-                                                    "status_of_employment", "employment_start"), show="headings")
+                                                    "type_of_contract", "type_of_employment", "status_of_employment",
+                                                    "salary", "employment_start"), show="headings")
         self.treeview.grid(row=12, column=0, columnspan=5, rowspan=10)
 
         # Define column headings
@@ -157,16 +158,22 @@ class FindATeacherFrame(ttk.Frame):
         self.treeview.heading("first_name", text="Imię")
         self.treeview.heading("last_name", text="Nazwisko")
         self.treeview.heading("language_to_teach", text="Język nauczania")
+        self.treeview.heading("type_of_contract", text="Rodzaj umowy")
+        self.treeview.heading("type_of_employment", text="Rodzaj zatrudnienia")
         self.treeview.heading("status_of_employment", text="Status zatrudnienia")
+        self.treeview.heading("salary", text="Wypłata")
         self.treeview.heading("employment_start", text="Data zatrudnienia")
 
         # Set column widths
-        self.treeview.column("teacher_id", width=50, anchor='center')
-        self.treeview.column("first_name", width=200, anchor='center')
-        self.treeview.column("last_name", width=250, anchor='center')
-        self.treeview.column("language_to_teach", width=250, anchor='center')
-        self.treeview.column("status_of_employment", width=200, anchor='center')
-        self.treeview.column("employment_start", width=300, anchor='center')
+        self.treeview.column("teacher_id", anchor='center')
+        self.treeview.column("first_name", anchor='center')
+        self.treeview.column("last_name", anchor='center')
+        self.treeview.column("language_to_teach", anchor='center')
+        self.treeview.column("type_of_contract", anchor='center')
+        self.treeview.column("type_of_employment", anchor='center')
+        self.treeview.column("status_of_employment", anchor='center')
+        self.treeview.column("salary", anchor='center')
+        self.treeview.column("employment_start", anchor='center')
 
         # Add a vertical scrollbar
         scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.treeview.yview)
@@ -246,7 +253,10 @@ class FindATeacherFrame(ttk.Frame):
                         first_name,
                         last_name,
                         language_to_teach,
+                        type_of_contract,
+                        type_of_employment,
                         status_of_employment,
+                        salary,
                         employment_start
                     FROM teachers
                     WHERE {}
@@ -262,13 +272,13 @@ class FindATeacherFrame(ttk.Frame):
                 self.treeview.delete(*self.treeview.get_children())
 
                 for row in results:
-                    date_str = str(row[5]).split()[0]
+                    date_str = str(row[8]).split()[0]
                     # Parse the date string into a datetime object
                     db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d-%m-%Y")
                     new_date = db_date.replace("-", ".")
 
                     self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]),
-                                                          (row[4]), new_date))
+                                                          (row[4]), (row[5]), (row[6]), (row[7]), new_date))
         finally:
             connection.close()
 
