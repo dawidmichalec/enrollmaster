@@ -1,9 +1,8 @@
 from tkinter import *
 import ttkbootstrap as ttk
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import psycopg2
 import re
-import decimal
 
 class NewStudentFrame(ttk.Frame):
 
@@ -15,6 +14,9 @@ class NewStudentFrame(ttk.Frame):
         self.rowconfigure(
             (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28),
             weight=1, minsize=30)
+
+        self.date_due = StringVar()
+        self.payment_status = StringVar()
 
         new_student_label = ttk.Label(self, text="NOWY UCZEŃ", font=('Open Sans', 14, 'bold'),
                                       bootstyle='default')
@@ -305,7 +307,8 @@ class NewStudentFrame(ttk.Frame):
         self.payment_var.set("")
 
         for payment_method in ['W placówce', 'Przelew']:
-            payment_dropdown_content.add_radiobutton(label=payment_method, variable=self.payment_var, value=payment_method,
+            payment_dropdown_content.add_radiobutton(label=payment_method, variable=self.payment_var,
+                                                     value=payment_method,
                                                      command=self.on_payment_select)
 
         self.payment_dropdown['menu'] = payment_dropdown_content
@@ -333,32 +336,35 @@ class NewStudentFrame(ttk.Frame):
         self.pack()
 
     def submit_data(self):
-
-        validation =self.validation_on_submission()
+        connection = self.establish_database_connection()
+        validation = self.validation_on_submission()
 
         try:
-            connection = self.establish_database_connection()
+
             cursor = connection.cursor()
             first_name = self.first_name.get()
             last_name = self.last_name.get()
             street = self.street.get()
             building_no = self.building_no.get()
-            local_no = self.local_no.get()
+            local_no = self.local_no.get() or None
             city = self.city.get()
             postal_code = self.postal_code.get()
             country = self.country.get()
-            email = self.email.get()
+            email = self.email.get() or None
             phone = self.phone_number.get()
             personal_id = self.personal_id.get()
             document_no = self.document_no.get()
             document_type = self.on_document_type_select()
             course_name = self.course_var.get()
             course_id = self.course_ids.get(course_name)
-
             enrollment_status = "Aktywny"
+            amount = self.price_entry.get()
+            payment_type = self.on_payment_select()
+            date_due = self.date_due.get()
+            payment_status = self.payment_status.get()
 
             if validation is True:
-                query = """
+                student_query = """
                         -- Insert into students
                         INSERT INTO students (
                         first_name, 
@@ -375,24 +381,80 @@ class NewStudentFrame(ttk.Frame):
                         document_no, 
                         document_type)
                         VALUES (
-                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                        
-                        -- Get the generated student_id
-                        SET @student_id := LAST_INSERT_ID();
-                        
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING student_id;
+                        """
+                cursor.execute(student_query, (
+                    first_name,
+                    last_name,
+                    street,
+                    building_no,
+                    local_no,
+                    city,
+                    postal_code,
+                    country,
+                    email,
+                    phone,
+                    personal_id,
+                    document_no,
+                    document_type,
+                ))
+                # Fetch the student_id returned by the first query
+                student_id = cursor.fetchone()[0]
+                print("Generated student_id:", student_id)
+                # Now you have the student_id and can use it in the subsequent queries
+
+                enrollment_status_query = """
                         -- Insert into enrollment_status using the generated student_id
                         INSERT INTO enrollment_status (student_id, course_id, status)
-                        VALUES (@student_id, %s, %s);
-                        
+                        VALUES (%s, %s, %s);
+                                        """
+
+                cursor.execute(enrollment_status_query, (student_id, course_id, enrollment_status))
+
+                payments_query = """
                         -- Insert into payments using generated student_id
                         INSERT INTO payments (student_id, course_id, amount, payment_type, date_due, status)
-                        VALUES (@student_id, %s, %s, %s, %s, %s);
-                        """
+                        VALUES (%s, %s, %s, %s, %s, %s);
+                                """
+
+                cursor.execute(payments_query, (student_id, course_id, amount, payment_type, date_due,
+                                                payment_status))
+
+                connection.commit()
+
+                self.first_name_var.set("")
+                self.last_name_var.set("")
+                self.street_var.set("")
+                self.building_no_var.set("")
+                self.local_no_var.set("")
+                self.city_var.set("")
+                self.postal_code_var.set("")
+                self.country_var.set("")
+                self.email_var.set("")
+                self.phone_var.set("")
+                self.personal_id_var.set("")
+                self.document_no_var.set("")
+                self.document_type.configure(text="Wybierz dokument")
+                self.document_var.set("")
+                self.language_var.set("Angielski")
+                self.language_dropdown.configure(text="Wybierz język")
+                self.level_var.set("Początkujący")
+                self.level_dropdown.configure(text="Wybierz poziom")
+                self.mode_var.set("Normalny")
+                self.mode_dropdown.configure(text="Wybierz tryb")
+                self.payment_var.set("")
+                self.payment_dropdown.configure(text="Wybierz sposób płatności")
+                self.course_var.set("")
+                self.course_dropdown.configure(text='Wybierz kurs')
+                self.price_var.set("")
+                self.start_date_var.set("")
+                self.start_date_entry.entry.configure(textvariable=self.start_date_var)
+                self.end_date_var.set("")
+                self.end_date_entry.entry.configure(textvariable=self.end_date_var)
 
                 self.show_custom_messagebox("Uczeń został dodany", "Info")
         finally:
             connection.close()
-
 
     def establish_database_connection(self):
         # Connect to the PostgreSQL database
@@ -457,7 +519,7 @@ class NewStudentFrame(ttk.Frame):
                     FROM courses
                     WHERE course_id = %s;
                     """
-            cursor.execute(query, (course_id, ))
+            cursor.execute(query, (course_id,))
 
             results = cursor.fetchall()
 
@@ -482,6 +544,36 @@ class NewStudentFrame(ttk.Frame):
         finally:
             connection.close()
 
+    def define_date_due_and_payment_status(self):
+        payment_type = self.payment_var.get()
+
+        if payment_type == "W placówce":
+            date_now = str(datetime.now()).split()[0]
+            due_date = datetime.strptime(date_now, "%Y-%m-%d").strftime("%d.%m.%Y")
+            self.payment_status.set("Zapłacone")
+            print(self.payment_status.get())
+            self.date_due.set(due_date)
+            print(due_date)
+        elif payment_type == 'Przelew':
+            date_now_str = str(datetime.now()).split()[0]
+            date_now = datetime.strptime(date_now_str, "%Y-%m-%d")
+            due_date = self.calculate_due_date(date_now, 1)  # Calculate due date 1 week from today
+            self.payment_status.set("Do zapłaty")
+            print(self.payment_status.get())
+            self.date_due.set(due_date)
+            print(self.date_due.get())
+        else:
+            due_date = ""
+
+    def calculate_due_date(self, start_date, weeks):
+        end_date = start_date
+        business_days_count = 0
+        while business_days_count < weeks * 14:
+            end_date += timedelta(days=1)
+            if end_date.weekday() < 5:  # Weekday is from 0 to 4 (Monday to Friday)
+                business_days_count += 1
+
+        return end_date.strftime("%d.%m.%Y")
 
     def on_course_select(self):
         selected_course = self.course_var.get()
@@ -521,6 +613,7 @@ class NewStudentFrame(ttk.Frame):
         selected_payment_method = self.payment_var.get()
         print("Selected payment method:", selected_payment_method)
         self.amend_menu_content_func(self.payment_dropdown, selected_payment_method)
+        self.define_date_due_and_payment_status()
         return selected_payment_method
 
     """
@@ -574,7 +667,6 @@ class NewStudentFrame(ttk.Frame):
             pass
         else:
             self.show_custom_messagebox("Pole 'Ulica' nie może zawierać znaków specjalnych", "Błąd")
-
 
     def validate_building_no(self, *args):
         building_no = self.building_no_var.get()
@@ -644,7 +736,6 @@ class NewStudentFrame(ttk.Frame):
         else:
             self.show_custom_messagebox("Pole 'Państwo' nie może zawierać znaków specjalnych", "Błąd")
 
-
     def validate_email(self, *args):
         email = self.email_var.get()
         print(len(email))
@@ -685,7 +776,7 @@ class NewStudentFrame(ttk.Frame):
         if len(doc_no) > 32:
             self.show_custom_messagebox("Długość numeru dokumentu nie może przekraczać 32 znaków", "Błąd")
 
-    def validate_input(self,input_value, max_length, error_message, allow_empty=False, regex=None):
+    def validate_input(self, input_value, max_length, error_message, allow_empty=False, regex=None):
         if not allow_empty and not input_value.strip():
             self.show_custom_messagebox(f"Pole '{error_message}' nie może być puste\nPopraw formularz", "Błąd")
             return False
@@ -696,6 +787,7 @@ class NewStudentFrame(ttk.Frame):
             self.show_custom_messagebox(error_message, "Błąd")
             return False
         return True
+
     def validation_on_submission(self):
 
         regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
@@ -736,6 +828,9 @@ class NewStudentFrame(ttk.Frame):
             return False
         if not self.validate_input(self.document_no_var.get(), 32, "Nr dokumentu", allow_empty=False, regex=regex):
             return False
+        if self.payment_var.get() == "":
+            self.show_custom_messagebox("Należy wybrać metodę płatności", "Błąd")
+            return False
 
         return True
 
@@ -761,4 +856,3 @@ class NewStudentFrame(ttk.Frame):
 
         Label(custom_mb, text=message, font=('Open Sans', 12), pady=20).pack()
         Button(custom_mb, text="OK", command=custom_mb.destroy, width=20, height=1, font=('Open Sans', 12)).pack()
-
