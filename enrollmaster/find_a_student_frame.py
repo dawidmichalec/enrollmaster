@@ -200,6 +200,7 @@ class FindAStudentFrame(ttk.Frame):
                 self.show_custom_information("Nie znaleziono pasujących wyników. "
                                              "Spróbuj zmodyfikować kryteria wyszukiwania",
                                              "Info")
+                return
 
             if first_name:
                 conditions.append("s.first_name = %s")

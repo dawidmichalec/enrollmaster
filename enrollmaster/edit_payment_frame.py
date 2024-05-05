@@ -46,9 +46,9 @@ class EditPaymentFrame(ttk.Frame):
         ## submit_button
 
         submit_button_style = ttk.Style()
-        submit_button_style.configure('success.TButton', font=('Open Sans', 16))
+        submit_button_style.configure('success.TButton', font=('Open Sans', 14))
 
-        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=13,
+        submit_button = ttk.Button(self, bootstyle='success', text='SZUKAJ', width=16,
                                    style='success.TButton')
         submit_button.grid(row=5, column=2, sticky='w')
 
