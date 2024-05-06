@@ -2,7 +2,7 @@
 
 
 
-CREATE DATABASE enroll_master_db;
+CREATE DATABASE enroll_proto;
 
 
 
