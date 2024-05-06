@@ -22,7 +22,7 @@ class NewStudentFrame(ttk.Frame):
                                       bootstyle='default')
         new_student_label.grid(column=3, row=0, sticky='w')
 
-        ## first_name
+        # first_name
 
         first_name_label = ttk.Label(self, text="Imię*", font=('Open Sans', 12), bootstyle='default')
         first_name_label.grid(row=2, column=0, sticky='w')
@@ -34,7 +34,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.first_name_var.trace_add('write', self.validate_first_name)
 
-        ## last_name
+        # last_name
 
         last_name_label = ttk.Label(self, text="Nazwisko*", font=('Open Sans', 12), bootstyle='default')
         last_name_label.grid(row=2, column=2, sticky='w')
@@ -46,7 +46,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.last_name_var.trace_add('write', self.validate_last_name)
 
-        ## street
+        # street
 
         street_label = ttk.Label(self, text='Ulica*', font=('Open Sans', 12), bootstyle='default')
         street_label.grid(row=5, column=0, sticky='w')
@@ -58,7 +58,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.street_var.trace_add('write', self.validate_street)
 
-        ## building_no
+        # building_no
 
         building_no_label = ttk.Label(self, text='Nr domu*', font=('Open Sans', 12), bootstyle='default')
         building_no_label.grid(row=5, column=2, sticky='w')
@@ -70,7 +70,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.building_no_var.trace_add('write', self.validate_building_no)
 
-        ## local_no
+        # local_no
 
         local_no_label = ttk.Label(self, text='Nr lokalu', font=('Open Sans', 12), bootstyle='default')
         local_no_label.grid(row=5, column=3, sticky='w')
@@ -82,7 +82,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.local_no_var.trace_add('write', self.validate_local_no)
 
-        ## city
+        # city
 
         city_label = ttk.Label(self, text="Miasto*", font=('Open Sans', 12), bootstyle='default')
         city_label.grid(row=8, column=0, sticky='w')
@@ -94,7 +94,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.city_var.trace_add('write', self.validate_city)
 
-        ## postal_code
+        # postal_code
 
         postal_code_label = ttk.Label(self, text="Kod pocztowy*", font=('Open Sans', 12),
                                       bootstyle='default')
@@ -107,7 +107,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.postal_code_var.trace_add('write', self.validate_postal_code)
 
-        ## country
+        # country
 
         country_label = ttk.Label(self, text="Państwo*", font=('Open Sans', 12), bootstyle='default')
         country_label.grid(row=8, column=3, sticky='w')
@@ -119,7 +119,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.country_var.trace_add('write', self.validate_country)
 
-        ## email
+        # email
 
         email_label = ttk.Label(self, text="Adres e-mail", font=('Open Sans', 12), bootstyle='default')
         email_label.grid(row=11, column=0, sticky='w')
@@ -131,7 +131,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.email_var.trace_add('write', self.validate_email)
 
-        ## phone number
+        # phone number
 
         phone_number_label = ttk.Label(self, text="Nr telefonu*", font=('Open Sans', 12),
                                        bootstyle='default')
@@ -144,7 +144,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.phone_var.trace_add('write', self.validate_phone)
 
-        ## personal id
+        # personal id
 
         personal_id_label = ttk.Label(self, text="PESEL*", font=('Open Sans', 12), bootstyle='default')
         personal_id_label.grid(row=14, column=0, sticky='w')
@@ -156,7 +156,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.personal_id_var.trace_add('write', self.validate_personal_id)
 
-        ## document_no
+        # document_no
 
         document_no_label = ttk.Label(self, text="Nr dokumentu*", font=('Open Sans', 12),
                                       bootstyle='default')
@@ -169,7 +169,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.document_no_var.trace_add('write', self.validate_document_no)
 
-        ## document_type
+        # document_type
 
         document_type_label = ttk.Label(self, text="Rodzaj dokumentu*", font=('Open Sans', 12),
                                         bootstyle='default')
@@ -189,7 +189,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.document_type['menu'] = document_type_content
 
-        ## language
+        # language
 
         language_label = ttk.Label(self, text="Język kursu*", font=('Open Sans', 12), bootstyle='default')
         language_label.grid(row=17, column=0, sticky='w')
@@ -208,7 +208,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.language_dropdown['menu'] = language_dropdown_content
 
-        ## level
+        # level
 
         level_label = ttk.Label(self, text="Poziom*", font=('Open Sans', 12), bootstyle='default')
         level_label.grid(row=17, column=2, sticky='w')
@@ -227,7 +227,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.level_dropdown['menu'] = level_dropdown_content
 
-        ## mode
+        # mode
 
         mode_label = ttk.Label(self, text="Tryb*", font=('Open Sans', 12), bootstyle='default')
         mode_label.grid(row=17, column=3, sticky='w')
@@ -246,7 +246,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.mode_dropdown['menu'] = mode_dropdown_content
 
-        ## course
+        # course
 
         course_label = ttk.Label(self, text="Wybierz dostępny kurs*", font=('Open Sans', 12),
                                  bootstyle='default')
@@ -265,7 +265,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.course_dropdown['menu'] = self.course_dropdown_content
 
-        ## start_date
+        # start_date
 
         start_date_label = ttk.Label(self, text="Data rozpoczęcia*", font=('Open Sans', 12),
                                      bootstyle='default')
@@ -279,7 +279,7 @@ class NewStudentFrame(ttk.Frame):
         self.start_date_entry.entry.configure(textvariable=self.start_date_var)
         self.start_date_entry.grid(row=21, column=0, sticky='w')
 
-        ## end_date
+        # end_date
 
         end_date_label = ttk.Label(self, text="Data zakończenia", font=('Open Sans', 12),
                                    bootstyle='default')
@@ -293,7 +293,7 @@ class NewStudentFrame(ttk.Frame):
         self.end_date_entry.entry.configure(textvariable=self.end_date_var)
         self.end_date_entry.grid(row=21, column=2, sticky='w')
 
-        ## payment
+        # payment
 
         payment_label = ttk.Label(self, text="Płatność*", font=('Open Sans', 12), bootstyle='default')
         payment_label.grid(row=20, column=3, sticky='w')
@@ -313,7 +313,7 @@ class NewStudentFrame(ttk.Frame):
 
         self.payment_dropdown['menu'] = payment_dropdown_content
 
-        ## prize
+        # price
 
         prize_label = ttk.Label(self, text="Cena", font=('Open Sans', 12), bootstyle='default')
         prize_label.grid(row=20, column=4, sticky='w')
@@ -324,7 +324,7 @@ class NewStudentFrame(ttk.Frame):
         self.price_entry.configure(state='readonly')
         self.price_entry.grid(row=21, column=4, sticky='w')
 
-        ## submit
+        # submit
 
         submit_button_style = ttk.Style()
         submit_button_style.configure('success.TButton', font=('Open Sans', 14))

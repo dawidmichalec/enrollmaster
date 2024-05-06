@@ -94,7 +94,7 @@ class EditTeacherInfoFrame(ttk.Frame):
                                             bootstyle='default')
         output_first_name_label.grid(row=8, column=2, sticky='w')
 
-        self.output_first_name = ttk.Entry(self, bootstyle='default', width=15, textvariable=self.first_name_var)
+        self.output_first_name = ttk.Entry(self, bootstyle='default', width=20, textvariable=self.first_name_var)
         self.output_first_name.configure(state='readonly')
         self.output_first_name.grid(row=9, column=2, sticky='w')
 
@@ -104,7 +104,7 @@ class EditTeacherInfoFrame(ttk.Frame):
                                            bootstyle='default')
         output_last_name_label.grid(row=8, column=3, sticky='w')
 
-        self.output_last_name = ttk.Entry(self, bootstyle='default', width=15, textvariable=self.last_name_var)
+        self.output_last_name = ttk.Entry(self, bootstyle='default', width=20, textvariable=self.last_name_var)
         self.output_last_name.configure(state='readonly')
         self.output_last_name.grid(row=9, column=3, sticky='w')
 
@@ -545,10 +545,14 @@ class EditTeacherInfoFrame(ttk.Frame):
                 street = self.street_var.get()
                 building_no = self.building_no_var.get()
                 local_no = self.local_no_var.get()
+                if local_no == "None":
+                    local_no = None
                 city = self.city_var.get()
                 postal_code = self.postal_code_var.get()
                 country = self.country_var.get()
                 email = self.email_var.get()
+                if email == "None":
+                    email = None
                 phone = self.phone_number_var.get()
                 personal_id = self.personal_id_var.get()
                 document_no = self.document_no_var.get()
@@ -952,7 +956,7 @@ class EditTeacherInfoFrame(ttk.Frame):
             self.show_custom_information("Długość adresu email nie może przekraczać 64 znaków", "Błąd")
 
     def validate_phone(self, *args):
-        phone = self.phone_var.get()
+        phone = self.phone_number_var.get()
 
         for i in phone:
             if i.isdigit() is False:
