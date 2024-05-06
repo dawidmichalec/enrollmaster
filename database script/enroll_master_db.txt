@@ -1,0 +1,418 @@
+-------------------------1. Creating database --------------------------------------------------
+
+
+
+CREATE DATABASE enroll_master_db;
+
+
+
+-------------------------2. Creating tables ----------------------------------------------------
+
+
+
+-- 2.1 Creating teachers table.
+
+CREATE TABLE teachers(
+	teacher_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	first_name VARCHAR(64) NOT NULL,
+	last_name VARCHAR(64) NOT NULL,
+	street VARCHAR(128) NOT NULL,
+	building_no INT NOT NULL,
+	local_no INT,
+	city VARCHAR(64) NOT NULL,
+	postal_code VARCHAR(8) NOT NULL,
+	country VARCHAR(64)NOT NULL,
+	email VARCHAR(64),
+	phone INT NOT NULL,
+	personal_id	VARCHAR(32) NOT NULL,
+	document_no	VARCHAR(32) NOT NULL,
+	document_type	VARCHAR(32) NOT NULL,
+	type_of_contract VARCHAR(32) NOT NULL,
+	type_of_employment	VARCHAR(32) NOT NULL,
+	salary	NUMERIC(8,2) NOT NULL,
+	native_language VARCHAR(16) NOT NULL,
+	language_to_teach VARCHAR(16) NOT NULL,
+	status_of_employment VARCHAR(16),
+	employment_start TIMESTAMP, 
+	created	TIMESTAMP DEFAULT NOW(),
+	modified TIMESTAMP
+);
+
+
+-- 2.2 Creating courses table.
+
+CREATE TABLE courses (
+	course_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	name VARCHAR(255) NOT NULL,
+	language VARCHAR(16) NOT NULL,
+	level VARCHAR(16) NOT NULL,
+	start_date DATE NOT NULL,
+	end_date DATE NOT NULL,
+	mode VARCHAR(16),
+	price NUMERIC(8, 2) NOT NULL,
+	teacher_id INT,
+	number_of_students INT,
+	students_limit INT,
+	availability VARCHAR(16)
+	created	TIMESTAMP DEFAULT NOW(),
+	modified TIMESTAMP,
+	CONSTRAINT fk_teacher_id
+		FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id)
+);
+
+
+-- 2.3. Creating students table.
+
+
+CREATE TABLE students (
+	student_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	first_name VARCHAR(64) NOT NULL,
+	last_name VARCHAR(64) NOT NULL,
+	street VARCHAR(128) NOT NULL,
+	building_no INT NOT NULL,
+	local_no INT,
+	city VARCHAR(64) NOT NULL,
+	postal_code VARCHAR(8) NOT NULL, 
+	country VARCHAR(64) NOT NULL
+	email VARCHAR(64),
+	phone INT NOT NULL,
+	personal_id	VARCHAR(32) NOT NULL,
+	document_no	VARCHAR(32) NOT NULL,
+	document_type	VARCHAR(32) NOT NULL,
+	created	TIMESTAMP DEFAULT NOW(),
+	modified TIMESTAMP
+);
+
+
+-- 2.4. Creating enrollment_status table. 
+
+
+CREATE TABLE enrollment_status (
+	id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	student_id INT,
+	course_id INT,
+	status VARCHAR(32) NOT NULL,
+	created TIMESTAMP DEFAULT NOW(),
+	modified TIMESTAMP,
+	CONSTRAINT fk_student
+		FOREIGN KEY (student_id) REFERENCES students(student_id),
+	CONSTRAINT fk_course
+		FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+
+-- 2.5. Creating payments table.
+
+
+CREATE TABLE payments (
+	payment_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	student_id INT,
+	course_id INT,
+	amount NUMERIC(8, 2),
+        payment_type VARCHAR(16) NOT NULL,
+	date_due TIMESTAMP,
+	status VARCHAR(16),
+	created TIMESTAMP DEFAULT NOW(),
+	modified TIMESTAMP,
+	CONSTRAINT fk_student
+		FOREIGN KEY (student_id) REFERENCES students(student_id),
+	CONSTRAINT fk_course_id
+		FOREIGN KEY (course_id) REFERENCES courses(course_id)
+);
+
+
+
+-------------------------3. Creating trigger functions ----------------------------------------------
+
+
+
+-- 3.1 Trigger function to update 'modified' column
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.modified = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 3.2 Trigger function to update 'created' and 'modified' columns on INSERT
+CREATE OR REPLACE FUNCTION update_created_and_modified_columns()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.created = NOW();
+    NEW.modified = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 3.3 Trigger function to standardize and clean data inserted into the teachers table
+
+CREATE OR REPLACE FUNCTION standardize_teachers()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.first_name = INITCAP(NEW.first_name);
+    NEW.last_name = INITCAP(NEW.last_name);
+    NEW.street = INITCAP(NEW.street);
+    NEW.city = INITCAP(NEW.city);
+    NEW.country = INITCAP(NEW.country);
+    NEW.document_type = UPPER(LEFT(NEW.document_type, 1)) || LOWER(RIGHT(NEW.document_type, -1));
+    NEW.type_of_contract = INITCAP(NEW.type_of_contract);
+    NEW.type_of_employment = UPPER(LEFT(NEW.type_of_employment, 1)) || LOWER(RIGHT(NEW.type_of_employment, -1));
+    NEW.status_of_employment = INITCAP(NEW.status_of_employment);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- 3.4 Trigger function to standardize and clean data inserted into the courses table
+
+CREATE OR REPLACE FUNCTION standardize_courses()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.language = INITCAP(NEW.language);
+    NEW.level = INITCAP(NEW.level);
+    NEW.mode = INITCAP(NEW.mode);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- 3.5 Trigger function to standardize and clean data inserted into the students table
+
+CREATE OR REPLACE FUNCTION standardize_students()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.first_name = INITCAP(NEW.first_name);
+    NEW.last_name = INITCAP(NEW.last_name);
+    NEW.street = INITCAP(NEW.street);
+    NEW.city = INITCAP(NEW.city);
+    NEW.country = INITCAP(NEW.country);
+    NEW.document_type = UPPER(LEFT(NEW.document_type, 1)) || LOWER(RIGHT(NEW.document_type, -1));
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- 3.6 Trigger function to increment number_of_students value in courses table each time a new student is assigned to the course.
+
+CREATE OR REPLACE FUNCTION increment_students_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE courses
+        SET number_of_students = number_of_students + 1
+        WHERE course_id = NEW.course_id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- 3.7 Trigger function to update the course's availability if the number of students value will reach students_limit value.
+
+CREATE OR REPLACE FUNCTION update_course_availability()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE courses
+    SET availability = CASE
+                          WHEN (SELECT COUNT(*) FROM enrollment_status WHERE course_id = NEW.course_id) >= students_limit THEN 'Brak miejsc'
+                          ELSE 'Dostępny'
+                      END
+    WHERE course_id = NEW.course_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+-------------------------4. Creating triggers --------------------------------------------------
+
+
+
+-- 4.1. Triggers to the teachers table.
+
+
+
+-- 4.1.1. Trigger to update 'modified' column on UPDATE teachers table.
+
+CREATE TRIGGER teachers_update_modified_trigger
+BEFORE UPDATE ON teachers
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+-- 4.1.2. Trigger to update 'created' and 'modified' columns on INSERT INTO teachers table.
+
+CREATE TRIGGER teachers_insert_created_and_modified_trigger
+BEFORE INSERT ON teachers
+FOR EACH ROW
+EXECUTE FUNCTION update_created_and_modified_columns();
+
+
+-- 4.1.3. Trigger to standardize columns on INSERT INTO teachers table.
+
+CREATE TRIGGER teachers_insert_standardize_trigger
+BEFORE INSERT ON teachers
+FOR EACH ROW
+EXECUTE FUNCTION standardize_teachers();
+
+
+-- 4.1.4. Trigger to standardize columns on UPDATE teachers table.
+
+CREATE TRIGGER teachers_update_standardize_trigger
+BEFORE UPDATE ON teachers
+FOR EACH ROW
+EXECUTE FUNCTION standardize_teachers();
+
+
+
+-- 4.2. Triggers to the courses table.
+
+
+
+-- 4.2.1. Trigger to update 'modified' column on UPDATE courses table.
+
+CREATE TRIGGER courses_update_modified_trigger
+BEFORE UPDATE ON courses
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+-- 4.2.2. Trigger to update 'created' and 'modified' columns on INSERT INTO courses table.
+
+CREATE TRIGGER courses_insert_created_and_modified_trigger
+BEFORE INSERT ON courses
+FOR EACH ROW
+EXECUTE FUNCTION update_created_and_modified_columns();
+
+
+-- 4.2.3. Trigger to standardize columns on INSERT INTO courses table.
+
+CREATE TRIGGER courses_insert_standardize_trigger
+BEFORE INSERT ON courses
+FOR EACH ROW
+EXECUTE FUNCTION standardize_courses();
+
+
+-- 4.2.4. Trigger to standardize columns on UPDATE courses table.
+
+CREATE TRIGGER courses_update_standardize_trigger
+BEFORE UPDATE ON courses
+FOR EACH ROW
+EXECUTE FUNCTION standardize_courses();
+
+
+-- 4.3. Triggers to the students table.
+
+
+
+-- 4.3.1. Trigger to update 'modified' column on UPDATE courses table.
+
+CREATE TRIGGER students_update_modified_trigger
+BEFORE UPDATE ON students
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+-- 4.3.2. Trigger to update 'created' and 'modified' columns on INSERT INTO courses table.
+
+CREATE TRIGGER students_insert_created_and_modified_trigger
+BEFORE INSERT ON students
+FOR EACH ROW
+EXECUTE FUNCTION update_created_and_modified_columns(); 
+
+
+-- 4.3.3. Trigger to standardize columns on INSERT INTO students table.
+
+CREATE TRIGGER students_insert_standardize_trigger
+BEFORE INSERT ON students
+FOR EACH ROW
+EXECUTE FUNCTION standardize_students();
+
+
+-- 4.3.4. Trigger to standardize columns on UPDATE of the students table. 
+
+CREATE TRIGGER students_update_standardize_trigger
+BEFORE UPDATE ON students
+FOR EACH ROW
+EXECUTE FUNCTION standardize_students();
+
+
+
+-- 4.4. Triggers on the enrollment_status table
+
+
+
+-- 4.4.1. Trigger to update number of students
+
+CREATE TRIGGER update_students_count_trigger
+AFTER INSERT ON enrollment_status
+FOR EACH ROW
+EXECUTE FUNCTION increment_students_count();
+
+
+
+-- 4.4.2. Trigger to update the availability
+
+CREATE TRIGGER update_course_availability_trigger
+BEFORE INSERT ON enrollment_status
+FOR EACH ROW
+EXECUTE FUNCTION update_course_availability();
+
+
+
+-- 4.4.3. Trigger to update modified column on UPDATE enrollment_status table
+
+CREATE TRIGGER enrollment_status_update_modified_trigger
+BEFORE UPDATE ON enrollment_status
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+
+-- 4.4.4. Trigger to update created and modified columns on INSERT INTO enrollment_status table
+
+CREATE TRIGGER enrollment_status_insert_created_and_modified_trigger
+BEFORE INSERT ON enrollment_status
+FOR EACH ROW
+EXECUTE FUNCTION update_created_and_modified_columns(); 
+
+
+
+-- 4.5. Triggers on the payments table
+
+
+
+-- 4.5.1. Trigger to update modified column on UPDATE payments table
+
+CREATE TRIGGER payments_status_update_modified_trigger
+BEFORE UPDATE ON payments
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+
+
+-- 4.5.2. Trigger to update created and modified columns on INSERT INTO payments table
+
+
+
+CREATE TRIGGER payments_status_insert_created_and_modified_trigger
+BEFORE INSERT ON payments
+FOR EACH ROW
+EXECUTE FUNCTION update_created_and_modified_columns();
+
+
+
+
+-------------------------5. Populating the database with data ----------------------------------
+
+
+
+-- 5.1. Populating teacher_personal_info.
