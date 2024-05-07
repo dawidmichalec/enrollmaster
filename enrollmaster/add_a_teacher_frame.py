@@ -622,7 +622,7 @@ class AddATeacherFrame(ttk.Frame):
             return False
         if not self.validate_input(self.country_var.get(), 64, "Państwo", allow_empty=False):
             return False
-        if not self.validate_input(self.email_var.get(), 64, "Adres email", allow_empty=False):
+        if not self.validate_input(self.email_var.get(), 64, "Adres email", allow_empty=True):
             return False
         elif re.match(pattern, self.email_var.get()) is None:
             self.show_custom_messagebox("Format adresu email jest niepoprawny\nPopraw formularz", "Błąd")

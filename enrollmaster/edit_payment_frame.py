@@ -213,7 +213,7 @@ class EditPaymentFrame(ttk.Frame):
             self.cancel_button['state'] = 'disabled'
             self.save_button['state'] = 'disabled'
             self.edit_button['state'] = 'disabled'
-            self.show_custom_information("Dane kursu zostały zaktualizowane", "Info")
+            self.show_custom_information("Dane płatności zostały zaktualizowane", "Info")
         finally:
             connection.close()
 
