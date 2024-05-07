@@ -719,6 +719,7 @@ class EditTeacherInfoFrame(ttk.Frame):
         self.language_to_teach_var.set("")
         self.language_to_teach.configure(text='')
         self.employment_status_var.set("")
+        self.date_var.set("")
 
     def block_entries(self):
         self.output_first_name.configure(state='readonly')
