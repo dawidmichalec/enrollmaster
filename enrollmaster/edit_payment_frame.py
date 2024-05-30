@@ -285,7 +285,7 @@ class EditPaymentFrame(ttk.Frame):
                 results = cursor.fetchone()
 
                 if not results:
-                    self.show_custom_information("Nie znaleziono nauczyciela. Sprawdź czy podałeś poprawne ID kursu",
+                    self.show_custom_information("Nie znaleziono płatności. Sprawdź czy podałeś poprawne ID płatności",
                                                  "Info")
                 else:
                     self.edit_button['state'] = 'normal'
