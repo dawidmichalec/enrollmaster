@@ -4,6 +4,7 @@ import psycopg2
 from datetime import datetime
 import csv
 import os
+from dotenv import load_dotenv
 
 
 class GenerateReportFrame(ttk.Frame):
@@ -212,14 +213,16 @@ class GenerateReportFrame(ttk.Frame):
         self.show_custom_information("Raport w formacie CSV został wygenerowany", "Info")
         return filename
 
+    load_dotenv()
+
     def search_function(self):
 
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
         )
 
         try:
@@ -234,49 +237,53 @@ class GenerateReportFrame(ttk.Frame):
             conditions = []
             parameters = []
 
+            # Brak kryteriów
             if not start_date and not end_date and not language and not payment_type and not status:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
+                return
 
-            if start_date:
-                conditions.append("p.created > %s")
-                parameters.append(start_date)
-            if end_date:
-                conditions.append("p.created < %s")
-                parameters.append(end_date)
+            # Warunki dat
             if start_date and end_date:
                 conditions.append("p.created BETWEEN %s AND %s")
                 parameters.extend([start_date, end_date])
+            elif start_date:
+                conditions.append("p.created >= %s")
+                parameters.append(start_date)
+            elif end_date:
+                conditions.append("p.created <= %s")
+                parameters.append(end_date)
 
+            # Język kursu
             if language:
                 if language == "Wszystkie":
-                    conditions.append("c.language IN %s")
-                    language_all = ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']
-                    placeholders = ', '.join(['%s'] * len(language_all))
-                    conditions[-1] = conditions[-1].replace('%s', f'({placeholders})')
-                    parameters.extend(language_all)
+                    languages_all = ['Angielski', 'Niemiecki', 'Francuski', 'Włoski', 'Hiszpański']
+                    placeholders = ', '.join(['%s'] * len(languages_all))
+                    conditions.append(f"c.language IN ({placeholders})")
+                    parameters.extend(languages_all)
                 else:
                     conditions.append("c.language = %s")
                     parameters.append(language)
 
+            # Status płatności
             if status:
                 if status == "Wszystkie":
-                    conditions.append("p.status IN %s")
                     status_all = ['Do zapłaty', 'Zapłacone']
                     placeholders = ', '.join(['%s'] * len(status_all))
-                    conditions[-1] = conditions[-1].replace('%s', f'({placeholders})')
+                    conditions.append(f"p.status IN ({placeholders})")
                     parameters.extend(status_all)
                 else:
                     conditions.append("p.status = %s")
                     parameters.append(status)
 
+            # Typ płatności
             if payment_type:
                 if payment_type == "Wszystkie":
-                    conditions.append("p.payment_type IN %s")
                     payment_types_all = ['W placówce', 'Przelew']
                     placeholders = ', '.join(['%s'] * len(payment_types_all))
-                    conditions[-1] = conditions[-1].replace('%s', f'({placeholders})')
+                    conditions.append(f"p.payment_type IN ({placeholders})")
                     parameters.extend(payment_types_all)
                 else:
                     conditions.append("p.payment_type = %s")
@@ -284,48 +291,57 @@ class GenerateReportFrame(ttk.Frame):
 
             where_clause = " AND ".join(conditions)
 
-            query = """
-                    SELECT
-                        p.payment_id,
-                        p.student_id,
-                        s.first_name,
-                        s.last_name,
-                        c.course_id,
-                        c.name,
-                        c.language,
-                        c.level,
-                        c.mode,
-                        p.amount,
-                        p.payment_type,
-                        p.status,
-                        p.date_due,
-                        p.created
-                    FROM payments p
-                    JOIN students s ON p.student_id = s.student_id
-                    JOIN courses c ON p.course_id = c.course_id
-                    WHERE {};
-                    """.format(where_clause)
+            query = f"""
+                        SELECT
+                            p.payment_id,
+                            p.student_id,
+                            s.first_name,
+                            s.last_name,
+                            c.course_id,
+                            c.name,
+                            c.language,
+                            c.level,
+                            c.mode,
+                            p.amount,
+                            p.payment_type,
+                            p.status,
+                            p.date_due,
+                            p.created
+                        FROM payments p
+                        JOIN students s ON p.student_id = s.student_id
+                        JOIN courses c ON p.course_id = c.course_id
+                        WHERE {where_clause};
+                        """
 
-            cursor.execute(query, parameters)
+            cursor.execute(query, tuple(parameters))
             self.results = cursor.fetchall()
 
             if not self.results:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
             else:
                 self.treeview.delete(*self.treeview.get_children())
 
                 for row in self.results:
                     date_due_str = str(row[12]).split()[0]
-                    date_due_db = datetime.strptime(date_due_str, "%Y-%m-%d").strftime("%d.%m.%Y")
-
                     created_str = str(row[13]).split()[0]
+
+                    date_due_db = datetime.strptime(date_due_str, "%Y-%m-%d").strftime("%d.%m.%Y")
                     created_db = datetime.strptime(created_str, "%Y-%m-%d").strftime("%d.%m.%Y")
 
-                    self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]), (row[4]),
-                                                          (row[5]), (row[6]), (row[7]), (row[8]), (row[9]), (row[10]),
-                                                          (row[11]), date_due_db, created_db))
+                    self.treeview.insert(
+                        "", END,
+                        values=(
+                            row[0], row[1], row[2], row[3], row[4],
+                            row[5], row[6], row[7], row[8],
+                            row[9], row[10], row[11], date_due_db, created_db
+                        )
+                    )
+
+        except psycopg2.Error as e:
+            self.show_custom_information(f"Błąd bazy danych: {e}", "Błąd")
 
         finally:
             connection.close()

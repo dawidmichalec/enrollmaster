@@ -4,6 +4,8 @@ from ttkbootstrap.dialogs import Messagebox
 import psycopg2
 import re
 import decimal
+from dotenv import load_dotenv
+import os
 
 
 class AddATeacherFrame(ttk.Frame):
@@ -290,6 +292,8 @@ class AddATeacherFrame(ttk.Frame):
 
         self.pack()
 
+    load_dotenv()
+
     def submit_data(self):
 
         validation = self.validation_on_submission()
@@ -298,11 +302,11 @@ class AddATeacherFrame(ttk.Frame):
 
             # Connect to the database
             conn = psycopg2.connect(
-                database='enroll_proto',
-                host='localhost',
-                user='postgres',
-                password='kulek',
-                port='5432'
+                database=os.getenv('DB_NAME'),
+                host=os.getenv('DB_HOST'),
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                port=os.getenv('DB_PORT')
             )
 
             cur = conn.cursor()

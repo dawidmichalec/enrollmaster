@@ -3,6 +3,8 @@ import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime, timedelta
 import decimal
+from dotenv import load_dotenv
+import os
 
 
 class EditCourseFrame(ttk.Frame):
@@ -380,12 +382,15 @@ class EditCourseFrame(ttk.Frame):
 
     def establish_database_connection(self):
         # Connect to the PostgreSQL database
+        load_dotenv()
+
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
+
         )
         return connection
 

@@ -2,6 +2,8 @@ from tkinter import *
 import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
 
 class SearchPaymentFrame(ttk.Frame):
@@ -158,14 +160,16 @@ class SearchPaymentFrame(ttk.Frame):
         hscrollbar.grid(row=21, column=0, columnspan=5, sticky="ew")
         self.treeview.configure(xscrollcommand=hscrollbar.set)
 
+    load_dotenv()
+
     def search_function(self):
 
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
         )
 
         try:
@@ -182,13 +186,15 @@ class SearchPaymentFrame(ttk.Frame):
             conditions = []
             parameters = []
 
-            if not student_id and not first_name and not last_name and not course_id and not course_name \
-                and not amount and not date_due and not status:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+            # Brak kryteriów wyszukiwania
+            if not any([student_id, first_name, last_name, course_id, course_name, amount, date_due, status]):
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
                 return
 
+            # Tworzenie warunków SQL
             if student_id:
                 conditions.append("p.student_id = %s")
                 parameters.append(student_id)
@@ -208,7 +214,7 @@ class SearchPaymentFrame(ttk.Frame):
                 conditions.append("p.amount = %s")
                 parameters.append(amount)
             if date_due:
-                conditions.append("p.amount = %s")
+                conditions.append("p.date_due = %s")
                 parameters.append(date_due)
             if status:
                 conditions.append("p.status = %s")
@@ -216,42 +222,52 @@ class SearchPaymentFrame(ttk.Frame):
 
             where_clause = " AND ".join(conditions)
 
-            query = """
-                    SELECT
-                        p.payment_id,
-                        p.student_id,
-                        s.first_name,
-                        s.last_name,
-                        c.course_id,
-                        c.name,
-                        p.amount,
-                        p.payment_type,
-                        p.status,
-                        p.date_due
-                    FROM payments p
-                    JOIN students s ON p.student_id = s.student_id
-                    JOIN courses c ON p.course_id = c.course_id
-                    WHERE {}
-                    """.format(where_clause)
+            query = f"""
+                        SELECT
+                            p.payment_id,
+                            p.student_id,
+                            s.first_name,
+                            s.last_name,
+                            c.course_id,
+                            c.name,
+                            p.amount,
+                            p.payment_type,
+                            p.status,
+                            p.date_due
+                        FROM payments p
+                        JOIN students s ON p.student_id = s.student_id
+                        JOIN courses c ON p.course_id = c.course_id
+                        WHERE {where_clause};
+                        """
 
             cursor.execute(query, tuple(parameters))
             results = cursor.fetchall()
 
             if not results:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
             else:
                 self.treeview.delete(*self.treeview.get_children())
 
                 for row in results:
                     date_str = str(row[9]).split()[0]
-                    # Parse the date string into a datetime object
-                    db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d-%m-%Y")
-                    new_date = db_date.replace("-", ".")
+                    formatted_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d.%m.%Y")
 
-                    self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]),
-                                                          (row[4]), (row[5]), (row[6]), (row[7]), (row[8]), new_date))
+                    self.treeview.insert(
+                        "",
+                        END,
+                        values=(
+                            row[0], row[1], row[2], row[3],
+                            row[4], row[5], row[6], row[7],
+                            row[8], formatted_date
+                        )
+                    )
+
+        except psycopg2.Error as e:
+            self.show_custom_information(f"Błąd bazy danych: {e}", "Błąd")
+
         finally:
             connection.close()
 

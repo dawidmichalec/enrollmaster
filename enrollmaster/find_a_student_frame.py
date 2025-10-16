@@ -1,6 +1,9 @@
 from tkinter import *
 import ttkbootstrap as ttk
 import psycopg2
+from psycopg2 import sql
+import os
+from dotenv import load_dotenv
 
 
 class FindAStudentFrame(ttk.Frame):
@@ -172,13 +175,16 @@ class FindAStudentFrame(ttk.Frame):
         hscrollbar.grid(row=21, column=0, columnspan=5, sticky="ew")
         self.treeview.configure(xscrollcommand=hscrollbar.set)
 
+
+    load_dotenv()
+
     def search_function(self):
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
         )
 
         try:
@@ -195,69 +201,71 @@ class FindAStudentFrame(ttk.Frame):
             conditions = []
             parameters = []
 
-            if not first_name and not last_name and not course_id and not course_name and not language and not level \
-                and not mode and not enrollment_status:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+            if not any([first_name, last_name, course_id, course_name, language, level, mode, enrollment_status]):
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania", "Info"
+                )
                 return
 
             if first_name:
-                conditions.append("s.first_name = %s")
+                conditions.append(sql.SQL("s.first_name = %s"))
                 parameters.append(first_name)
             if last_name:
-                conditions.append("s.last_name = %s")
+                conditions.append(sql.SQL("s.last_name = %s"))
                 parameters.append(last_name)
             if course_id:
-                conditions.append("c.course_id = %s")
+                conditions.append(sql.SQL("c.course_id = %s"))
                 parameters.append(course_id)
             if course_name:
-                conditions.append("c.name = %s")
+                conditions.append(sql.SQL("c.name = %s"))
                 parameters.append(course_name)
             if language:
-                conditions.append("c.language = %s")
+                conditions.append(sql.SQL("c.language = %s"))
                 parameters.append(language)
             if level:
-                conditions.append("c.level = %s")
+                conditions.append(sql.SQL("c.level = %s"))
                 parameters.append(level)
             if mode:
-                conditions.append("c.mode = %s")
+                conditions.append(sql.SQL("c.mode = %s"))
                 parameters.append(mode)
             if enrollment_status:
-                conditions.append("es.status = %s")
+                conditions.append(sql.SQL("es.status = %s"))
                 parameters.append(enrollment_status)
 
-            where_clause = " AND ".join(conditions)
+            base_query = sql.SQL("""
+                       SELECT
+                           s.student_id,
+                           s.first_name,
+                           s.last_name,
+                           c.course_id,
+                           c.name,
+                           c.language,
+                           c.level,
+                           c.mode,
+                           es.status
+                       FROM students s
+                       JOIN enrollment_status es ON s.student_id = es.student_id
+                       JOIN courses c ON es.course_id = c.course_id
+                   """)
 
-            query = """
-                    SELECT
-                        s.student_id,
-                        s.first_name,
-                        s.last_name,
-                        c.course_id,
-                        c.name,
-                        c.language,
-                        c.level,
-                        c.mode,
-                        es.status
-                    FROM students s
-                    JOIN enrollment_status es ON s.student_id = es.student_id
-                    JOIN courses c ON es.course_id = c.course_id
-                    WHERE {}
-                    """.format(where_clause)
+            if conditions:
+                where_clause = sql.SQL(" WHERE ") + sql.SQL(" AND ").join(conditions)
+                final_query = base_query + where_clause
+            else:
+                final_query = base_query
 
-            cursor.execute(query, tuple(parameters))
+            cursor.execute(final_query, parameters)
             results = cursor.fetchall()
 
             if not results:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania", "Info"
+                )
             else:
                 self.treeview.delete(*self.treeview.get_children())
-
                 for row in results:
                     self.treeview.insert("", END, values=row)
+
         finally:
             connection.close()
 

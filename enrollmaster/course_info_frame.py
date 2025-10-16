@@ -2,6 +2,8 @@ from tkinter import *
 import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 
 
 class CourseInfoFrame(ttk.Frame):
@@ -199,13 +201,16 @@ class CourseInfoFrame(ttk.Frame):
 
         self.pack()
 
+
+    load_dotenv()
+
     def search_function(self):
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
         )
 
         try:
@@ -222,13 +227,6 @@ class CourseInfoFrame(ttk.Frame):
 
             conditions = []
             parameters = []
-
-            if not teacher_first_name and not teacher_last_name and not course_name and not language \
-                and not level and not mode and not availability and not start_date and not end_date:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
-                return
 
             if teacher_first_name:
                 conditions.append("t.first_name = %s")
@@ -258,29 +256,33 @@ class CourseInfoFrame(ttk.Frame):
                 conditions.append("c.end_date < %s")
                 parameters.append(end_date)
 
-            if start_date and end_date:
-                conditions.append("c.start_date > %s AND c.end_date < %s")
-                parameters.extend(start_date, end_date)
+            if not conditions:
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
+                return
 
-            where_clause = " AND ".join(conditions)
+            base_query = """
+                        SELECT
+                            c.course_id,
+                            c.name,
+                            c.language,
+                            c.level, 
+                            c.mode,
+                            CONCAT(t.first_name, ' ', t.last_name) as teacher_name,
+                            c.number_of_students,
+                            c.students_limit,
+                            c.start_date,
+                            c.end_date
+                        FROM courses c
+                        JOIN teachers t ON c.teacher_id = t.teacher_id
+                    """
 
-            query = """
-                    SELECT
-                    c.course_id,
-                    c.name,
-                    c.language,
-                    c.level, 
-                    c.mode,
-                    CONCAT(t.first_name, ' ', t.last_name) as teacher_name,
-                    c.number_of_students,
-                    c.students_limit,
-                    c.start_date,
-                    c.end_date
-                    FROM courses c
-                    JOIN teachers t ON c.teacher_id = t.teacher_id
-                    WHERE {}
-                    """.format(where_clause)
-            cursor.execute(query, parameters)
+            where_clause = " WHERE " + " AND ".join(conditions)
+            full_query = base_query + where_clause
+
+            cursor.execute(full_query, tuple(parameters))
             results = cursor.fetchall()
 
             if not results:

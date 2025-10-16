@@ -2,6 +2,8 @@ from tkinter import *
 import ttkbootstrap as ttk
 import psycopg2
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 
 
 class FindATeacherFrame(ttk.Frame):
@@ -185,14 +187,16 @@ class FindATeacherFrame(ttk.Frame):
         hscrollbar.grid(row=21, column=0, columnspan=5, sticky="ew")
         self.treeview.configure(xscrollcommand=hscrollbar.set)
 
+    load_dotenv()
+
     def search_function(self):
 
         connection = psycopg2.connect(
-            database='enroll_proto',
-            host='localhost',
-            user='postgres',
-            password='kulek',
-            port='5432'
+            database=os.getenv('DB_NAME'),
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD'),
+            port=os.getenv('DB_PORT')
         )
 
         try:
@@ -209,13 +213,16 @@ class FindATeacherFrame(ttk.Frame):
             conditions = []
             parameters = []
 
+            # Brak kryteriów wyszukiwania
             if not first_name and not last_name and not language_to_teach and not type_of_contract \
-                and not type_of_employment and not status and not employment_start_from and not employment_start_to:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                    and not type_of_employment and not status and not employment_start_from and not employment_start_to:
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
                 return
 
+            # Budowanie warunków zapytania
             if first_name:
                 conditions.append("first_name = %s")
                 parameters.append(first_name)
@@ -234,51 +241,60 @@ class FindATeacherFrame(ttk.Frame):
             if status:
                 conditions.append("status_of_employment = %s")
                 parameters.append(status)
-            if employment_start_from:
-                conditions.append("employment_start > %s")
-                parameters.append(employment_start_from)
-            if employment_start_to:
-                conditions.append("employment_start < %s")
-                parameters.append(employment_start_to)
 
+            # Warunki zakresu dat zatrudnienia
             if employment_start_from and employment_start_to:
-                conditions.append("employment_start > %s AND employment_start < %s")
+                conditions.append("employment_start BETWEEN %s AND %s")
                 parameters.extend([employment_start_from, employment_start_to])
+            elif employment_start_from:
+                conditions.append("employment_start >= %s")
+                parameters.append(employment_start_from)
+            elif employment_start_to:
+                conditions.append("employment_start <= %s")
+                parameters.append(employment_start_to)
 
             where_clause = " AND ".join(conditions)
 
-            query = """
-                    SELECT
-                        teacher_id,
-                        first_name,
-                        last_name,
-                        language_to_teach,
-                        type_of_contract,
-                        type_of_employment,
-                        status_of_employment,
-                        salary,
-                        employment_start
-                    FROM teachers
-                    WHERE {}
-                    """.format(where_clause)
+            query = f"""
+                        SELECT
+                            teacher_id,
+                            first_name,
+                            last_name,
+                            language_to_teach,
+                            type_of_contract,
+                            type_of_employment,
+                            status_of_employment,
+                            salary,
+                            employment_start
+                        FROM teachers
+                        WHERE {where_clause}
+                        """
+
             cursor.execute(query, tuple(parameters))
             results = cursor.fetchall()
 
             if not results:
-                self.show_custom_information("Nie znaleziono pasujących wyników. "
-                                             "Spróbuj zmodyfikować kryteria wyszukiwania",
-                                             "Info")
+                self.show_custom_information(
+                    "Nie znaleziono pasujących wyników. Spróbuj zmodyfikować kryteria wyszukiwania",
+                    "Info"
+                )
             else:
                 self.treeview.delete(*self.treeview.get_children())
 
                 for row in results:
                     date_str = str(row[8]).split()[0]
-                    # Parse the date string into a datetime object
-                    db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d-%m-%Y")
-                    new_date = db_date.replace("-", ".")
+                    db_date = datetime.strptime(date_str, "%Y-%m-%d").strftime("%d.%m.%Y")
 
-                    self.treeview.insert("", END, values=((row[0]), (row[1]), (row[2]), (row[3]),
-                                                          (row[4]), (row[5]), (row[6]), (row[7]), new_date))
+                    self.treeview.insert(
+                        "", END, values=(
+                            row[0], row[1], row[2], row[3],
+                            row[4], row[5], row[6], row[7], db_date
+                        )
+                    )
+
+        except psycopg2.Error as e:
+            self.show_custom_information(f"Błąd bazy danych: {e}", "Błąd")
+
         finally:
             connection.close()
 
