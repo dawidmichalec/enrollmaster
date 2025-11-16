@@ -407,12 +407,3 @@ CREATE TRIGGER payments_status_insert_created_and_modified_trigger
 BEFORE INSERT ON payments
 FOR EACH ROW
 EXECUTE FUNCTION update_created_and_modified_columns();
-
-
-
-
--------------------------5. Populating the database with data ----------------------------------
-
-
-
--- 5.1. Populating teacher_personal_info.
